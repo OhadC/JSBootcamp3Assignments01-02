@@ -20,11 +20,11 @@ function groups() {
         return false
     }
 
-    addUsersToGroup = (groupName, ...usersObj) => {
-        groupsByName[groupName].addUsers(...usersObj)
+    addUsersToGroup = (groupName, usersObjArr) => {
+        groupsByName[groupName].addUsers(...usersObjArr)
     }
 
-    removeUsersFromGroup = (groupName, ...usersObj) => {
-        groupsByName[groupName].removeUsers(...usersObj)
+    removeUsersFromGroup = (groupName, usersObjArr) => {
+        groupsByName[groupName].removeUsers(...usersObjArr)
     }
 }

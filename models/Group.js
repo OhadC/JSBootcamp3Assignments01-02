@@ -7,14 +7,14 @@ export default class Group {
         this.usersList = {} // {id: user, id: user}
     }
 
-    addUsers = (...usersObj) => {
-        for (let user in usersObj) {
+    addUsers = (usersObjArr) => {
+        for (let user in usersObjArr) {
             this.usersList[user.id] = user
         }
     }
 
-    removeUsers = (...usersObj) => {
-        for (let user of usersObj) {
+    removeUsers = (usersObjArr) => {
+        for (let user of usersObjArr) {
             if (this.usersList[user.id])
                 delete this.usersList[user.id]
         }
