@@ -1,0 +1,19 @@
+{
+  "name": "jsbootcamp3ohad",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OhadC/JSBootcamp3Ohad.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/OhadC/JSBootcamp3Ohad/issues"
+  },
+  "homepage": "https://github.com/OhadC/JSBootcamp3Ohad#readme"
+}

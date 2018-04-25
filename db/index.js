@@ -1,4 +1,4 @@
-const users = require('./users')
-const groups = require('./groups')
+const users = require('./Users')
+const groups = require('./Groups')
 
 module.exports = { users, groups }
