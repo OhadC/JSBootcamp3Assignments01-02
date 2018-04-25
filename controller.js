@@ -74,9 +74,9 @@ function removeUserFromGroup() {
 
 function printGroupsAndUsers() {
     const groups = db.groups.groups
-    for (let group in groups) {
+    for (let group of groups) {
         console.log(group.name)
-        for (let user in group.users) {
+        for (let user of group.users) {
             console.log('/t', user.name, '(' + user.age + ')')
         }
     }
