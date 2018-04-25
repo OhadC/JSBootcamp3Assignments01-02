@@ -20,13 +20,14 @@ class Users {
         }
         return false
     }
-    getAllUserNames() {
-        return [] // TODO: this
+    getUserByName(name){
+        const userIndex = this.getIndex(name)
+        return this.users[userIndex]
     }
     deleteUser(name) {
         const userIndex = this.getIndex(name)
         if (userIndex !== -1) {
-            // TODO: notify groups
+            removeUserFromAllGroups(name)
             this.users.splice(userIndex, 1)
             return true
         }
@@ -37,4 +38,4 @@ class Users {
     }
 }
 
-module.exports = new Users
+module.exports = new Users()

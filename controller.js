@@ -18,35 +18,69 @@ function createNewUser() {
 }
 
 function deleteUser() {
-
+    rl.question('Enter Username: \n', (uesrname) => {
+        db.users.deleteUser(uesrname)
+        controller()
+    })
 }
 
-function getListOfUsers() {
-
+function printUsers() {
+    const users = db.users.users
+    for (let user in users) {
+        console.log(user.name)
+    }
+    controller()
 }
 
 function createNewgroup() {
-
+    rl.question('Enter group name: \n', (groupName) => {
+        db.groups.createGroup(groupName)
+        controller()
+    })
 }
 
 function deleteGroup() {
-
+    rl.question('Enter group name: \n', (groupName) => {
+        db.groups.deleteGroup(groupName)
+        controller()
+    })
 }
 
 function printGroups() {
-
+    const groups = db.groups.groups
+    for (let group in groups) {
+        console.log(group.name)
+    }
+    controller()
 }
 
 function addUserToGroup() {
-
+    rl.question('Enter username: \n', (username) => {
+        rl.question('Enter group name: \n', (groupName) => {
+            db.groups.addUserToGroup(groupName, username)
+            controller()
+        })
+    })
 }
 
-function removeUserToGroup() {
-
+function removeUserFromGroup() {
+    rl.question('Enter username: \n', (username) => {
+        rl.question('Enter group name: \n', (groupName) => {
+            db.groups.removeUserFromGroup(groupName, username)
+            controller()
+        })
+    })
 }
 
 function printGroupsAndUsers() {
-
+    const groups = db.groups.groups
+    for (let group in groups) {
+        console.log(group.name)
+        for (let user in group.users) {
+            console.log('/t', user.name, '(' + user.age + ')')
+        }
+    }
+    controller()
 }
 
 const menus = {
@@ -68,7 +102,7 @@ const menus = {
             menu: 'createOrDeleteUser'
         }, {
             name: 'Get a list of users in the system (list of usernames)',
-            function: getListOfUsers
+            function: printUsers
         }
     ],
     createOrDeleteUser: [
@@ -113,7 +147,7 @@ const menus = {
             function: addUserToGroup
         }, {
             name: 'Remove user to group',
-            function: removeUserToGroup
+            function: removeUserFromGroup
         }
     ]
 }
