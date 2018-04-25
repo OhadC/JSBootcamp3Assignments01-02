@@ -6,124 +6,149 @@ const rl = readline.createInterface({
     output: process.stdout
 })
 
-const createUserMenu = {
-    question: 'enter username: ',
-    callback: name => {
-        controller.state.name = name
-        controller.state.currentMenu = createUserMenu.enterPassword
-        controller.run()
-    },
-    enterPassword: {
-        question: 'enter password: ',
-        callback: password => {
-            controller.state.password = password
-            controller.state.currentMenu = createUserMenu.enterAge
-            controller.run()
-        }
-    },
-    enterAge: {
-        question: 'enter age: ',
-        callback: age => {
-            controller.state.age = age
-
-            db.users.createUser(controller.state.name, controller.state.password, controller.state.age)
-
-            controller.state.currentMenu = mainMenu
-            controller.run()
-        }
-    }
+function createNewUser() {
+    rl.question('Enter Username: \n', (uesrname) => {
+        rl.question('Enter Password: \n', (password) => {
+            rl.question('Enter Age: \n', (age) => {
+                db.users.createUser(uesrname, password, age)
+                controller()
+            })
+        })
+    })
 }
 
-const deleteUserMenu = {
-    question: 'enter username: ',
-    callback: name => {
+function deleteUser() {
 
-        db.users.deleteUser(name)
-
-        controller.state.currentMenu = mainMenu
-        controller.run()
-    },
 }
 
-const createOrDeleteUserMenu = {
-    question: '1. Create  user \n' +
-        '2. Delete user \n',
-    callback: answer => {
-        switch (+answer) {
-            case 1:
-                controller.state.currentMenu = createUserMenu
-                break
-            case 2:
-                controller.state.currentMenu = deleteUserMenu
-                break
+function getListOfUsers() {
+
+}
+
+function createNewgroup() {
+
+}
+
+function deleteGroup() {
+
+}
+
+function printGroups() {
+
+}
+
+function addUserToGroup() {
+
+}
+
+function removeUserToGroup() {
+
+}
+
+function printGroupsAndUsers() {
+
+}
+
+const menus = {
+    main: [
+        {
+            name: 'Users',
+            menu: 'users'
+        }, {
+            name: 'Groups',
+            menu: 'groups'
+        }, {
+            name: 'Users to Groups association',
+            menu: 'usersToGroups'
         }
-        controller.run()
-    }
-}
-
-const usersMenu = {
-    question: '1. Create / delete users \n' +
-        '2. Get a list of users in the system (list of usernames) \n',
-    callback: answer => {
-        switch (+answer) {
-            case 1:
-                controller.state.currentMenu = createOrDeleteUserMenu
-                break
-            case 2:
-                console.log(db.users.getAllUserNames().reduce(((acc, name) => acc + ", " + name), "").substring(0, 2))
-
-                controller.state.currentMenu = mainMenu
-                break
+    ],
+    users: [
+        {
+            name: 'Create / delete users',
+            menu: 'createOrDeleteUser'
+        }, {
+            name: 'Get a list of users in the system (list of usernames)',
+            function: getListOfUsers
         }
-        controller.run()
-    }
-}
-
-const groupsMenu = {
-    question: '1. Create / delete groups \n' +
-        '2. Get a list of groups in the system',
-    callback: answer => {
-        switch (+answer) {
-            case 1:
-
-                break
-            case 2:
-                console.log(db.groups.getAllGroupsNames().reduce(((acc, name) => acc + ", " + name), "").substring(0, 2))
-
-                controller.state.currentMenu = mainMenu
-                break
+    ],
+    createOrDeleteUser: [
+        {
+            name: 'Create user',
+            function: createNewUser
+        }, {
+            name: 'Delete user',
+            function: deleteUser
         }
-        controller.run()
-    }
-}
-
-const mainMenu = {
-    question: '1. Users \n' +
-        '2. Groups \n' +
-        '3. Users to Groups association \n',
-    callback: answer => {
-        switch (+answer) {
-            case 1:
-                controller.state.currentMenu = usersMenu
-                break
-            case 2:
-                controller.state.currentMenu = groupsMenu
-                break
-            case 3:
-                controller.state.currentMenu = usersToGroupsMenu
-                break
+    ],
+    groups: [
+        {
+            name: 'Create / delete groups',
+            menu: 'createOrDeleteGroups'
+        }, {
+            name: 'Get a list of groups in the system',
+            function: printGroups
         }
-        controller.run()
-    }
+    ],
+    createOrDeleteGroups: [
+        {
+            name: 'Create group',
+            function: createNewgroup
+        }, {
+            name: 'Delete group',
+            function: deleteGroup
+        }
+    ],
+    usersToGroups: [
+        {
+            name: 'Add / remove user to / from group',
+            menu: 'addOrRemoveFromGroup'
+        }, {
+            name: 'Get a list of groups and users under each group',
+            function: printGroupsAndUsers
+        }
+    ],
+    addOrRemoveFromGroup: [
+        {
+            name: 'Add user to group',
+            function: addUserToGroup
+        }, {
+            name: 'Remove user to group',
+            function: removeUserToGroup
+        }
+    ]
 }
 
-const controller = {
-    run: () => {
-        rl.question(controller.state.currentMenu.question, controller.state.currentMenu.callback)
-    },
-    state: {
-        currentMenu: mainMenu
+function getMenuQuestion(menu) {
+    return menu.reduce((prevStr, choice, index) => {
+        return prevStr + '[' + (index + 1) + '] ' + choice.name + '\n'
+    }, '')
+}
+
+function questionCallback(answer, prevMenu) {
+    let nextFunction
+    if (!!+answer && +answer > 0 && +answer <= prevMenu.length) {
+        const selectdChoice = prevMenu[+answer - 1]
+        console.log(selectdChoice.name)
+        if (selectdChoice['menu']) {
+            const currMenu = menus[selectdChoice.menu]
+            nextFunction = function () {
+                rl.question(getMenuQuestion(currMenu), (answer) => {
+                    questionCallback(answer, currMenu)
+                })
+            }
+        } else {
+            nextFunction = selectdChoice.function
+        }
     }
+    nextFunction()
+}
+
+function controller() {
+    const currMenu = menus['main']
+
+    rl.question(getMenuQuestion(currMenu), (answer) => {
+        questionCallback(answer, currMenu)
+    })
 }
 
 module.exports = controller

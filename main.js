@@ -1,3 +1,3 @@
 const controller = require('./controller')
 
-controller.run()
+controller()

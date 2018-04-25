@@ -1,4 +1,4 @@
-const group = require('./../models/Group')
+const Group = require('./../models/Group')
 
 module.exports = groups = {
     groups: [], // TODO: return it to fucking object
