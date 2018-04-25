@@ -1,22 +1,27 @@
-export default class Group {
-    id = 0
-
+module.exports = class Group {
     constructor(name) {
-        this.id = id++
         this.name = name
-        this.usersList = {} // {id: user, id: user}
+        this.users = [] // TODO: return it to fucking object
     }
 
-    addUsers = (usersObjArr) => {
-        for (let user in usersObjArr) {
-            this.usersList[user.id] = user
+    addUser(user) {
+        if (getUserIndex(user.name) === -1) {
+            users.push(user)
+            return true
         }
+        return false
     }
 
-    removeUsers = (usersObjArr) => {
-        for (let user of usersObjArr) {
-            if (this.usersList[user.id])
-                delete this.usersList[user.id]
+    removeUser(userName) {
+        const userIndex = getUserIndex(userName)
+        if (userIndex !== -1) {
+            users.splice(userIndex, 1)
+            return true
         }
+        return false
+    }
+
+    getUserIndex(userName) {
+        return users.findIndex(user => user.name === userName)
     }
 }
