@@ -1,94 +1,4 @@
-const readline = require('readline')
-const db = {
-    users: new (require('./db/users'))(),
-    groups: new (require('./db/groups'))()
-}
-
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-})
-
-function createNewUser() {
-    rl.question('Enter Username: \n', (username) => {
-        rl.question('Enter Password: \n', (password) => {
-            rl.question('Enter Age: \n', (age) => {
-                db.users.createUser(username, password, age)
-                showMenu()
-            })
-        })
-    })
-}
-
-function deleteUser() {
-    rl.question('Enter Username: \n', (username) => {
-        if (db.users.deleteUser(username)) {
-            db.groups.removeUserFromAllGroups(username)
-        }
-        showMenu()
-    })
-}
-
-function printUsers() {
-    const users = db.users.getAllUsers()
-    users.map(user => console.log(user.name))
-    showMenu()
-}
-
-function createNewgroup() {
-    rl.question('Enter group name: \n', (groupName) => {
-        db.groups.createGroup(groupName)
-        showMenu()
-    })
-}
-
-function deleteGroup() {
-    rl.question('Enter group name: \n', (groupName) => {
-        db.groups.deleteGroup(groupName)
-        showMenu()
-    })
-}
-
-function printGroups() {
-    const groups = db.groups.getAllGroups()
-    groups.map(group => {
-        console.log(group.name)
-    })
-    showMenu()
-}
-
-function addUserToGroup() {
-    rl.question('Enter username: \n', (username) => {
-        rl.question('Enter group name: \n', (groupName) => {
-            const user = db.users.getUser(username)
-            if (user) {
-                db.groups.addUserToGroup(groupName, user)
-            }
-            showMenu()
-        })
-    })
-}
-
-function removeUserFromGroup() {
-    rl.question('Enter username: \n', (username) => {
-        rl.question('Enter group name: \n', (groupName) => {
-            db.groups.removeUserFromGroup(groupName, username)
-            showMenu()
-        })
-    })
-}
-
-function printGroupsAndUsers() {
-    const groups = db.groups.getAllGroups()
-    groups.map(group => {
-        console.log(group.name)
-        const groupUsers = group.getAllUsers()
-        groupUsers.map(user => console.log('\t', user.name, '(' + user.age + ')'))
-    })
-    showMenu()
-}
-
-const menus = {
+module.exports = menu = {
     main: [
         {
             name: 'Users',
@@ -157,36 +67,81 @@ const menus = {
     ]
 }
 
-function createMenuQuestion(menu) {
-    return menu.reduce((prevStr, choice, index) => {
-        return prevStr + '[' + (index + 1) + '] ' + choice.name + '\n'
-    }, '')
-}
-
-function questionCallback(answer, prevMenu) {
-    let nextFunction
-    answer = +answer
-    if (!!answer && answer > 0 && answer <= prevMenu.length) {
-        const selectdChoice = prevMenu[answer - 1]
-        console.log(selectdChoice.name)
-        if (selectdChoice['menu']) {
-            nextFunction = () => showMenu(selectdChoice.menu)
-        } else {
-            nextFunction = selectdChoice.function
-        }
-    } else {
-        console.log('Wrong input! Try again:')
-        nextFunction = showMenu
-    }
-    nextFunction()
-}
-
-function showMenu(menuName) {
-    const currMenu = menus[menuName || 'main']
-
-    rl.question(createMenuQuestion(currMenu), (answer) => {
-        questionCallback(answer, currMenu)
+function createNewUser(callback, rl, db) {
+    rl.question('Enter Username: \n', (username) => {
+        rl.question('Enter Password: \n', (password) => {
+            rl.question('Enter Age: \n', (age) => {
+                db.users.createUser(username, password, age)
+                callback()
+            })
+        })
     })
 }
 
-module.exports = { showMenu }
+function deleteUser(callback, rl, db) {
+    rl.question('Enter Username: \n', (username) => {
+        if (db.users.deleteUser(username)) {
+            db.groups.removeUserFromAllGroups(username) // ? console.log("Success!") : console.log("something went wrong!   ********")
+        }
+        callback()
+    })
+}
+
+function printUsers(callback, rl, db) {
+    const users = db.users.getAllUsers()
+    users.map(user => console.log(user.name))
+    callback()
+}
+
+function createNewgroup(callback, rl, db) {
+    rl.question('Enter group name: \n', (groupName) => {
+        db.groups.createGroup(groupName) // ? console.log("Success!") : console.log("something went wrong!   ********")
+        callback()
+    })
+}
+
+function deleteGroup(callback, rl, db) {
+    rl.question('Enter group name: \n', (groupName) => {
+        db.groups.deleteGroup(groupName) // ? console.log("Success!") : console.log("something went wrong!   ********")
+        callback()
+    })
+}
+
+function printGroups(callback, rl, db) {
+    const groups = db.groups.getAllGroups()
+    groups.map(group => {
+        console.log(group.name)
+    })
+    callback()
+}
+
+function addUserToGroup(callback, rl, db) {
+    rl.question('Enter username: \n', (username) => {
+        rl.question('Enter group name: \n', (groupName) => {
+            const user = db.users.getUser(username)
+            if (user) {
+                db.groups.addUserToGroup(groupName, user) // ? console.log("Success!") : console.log("something went wrong!   ********")
+            }
+            callback()
+        })
+    })
+}
+
+function removeUserFromGroup(callback, rl, db) {
+    rl.question('Enter username: \n', (username) => {
+        rl.question('Enter group name: \n', (groupName) => {
+            db.groups.removeUserFromGroup(groupName, username) // ? console.log("Success!") : console.log("something went wrong!   ********")
+            callback()
+        })
+    })
+}
+
+function printGroupsAndUsers(callback, rl, db) {
+    const groups = db.groups.getAllGroups()
+    groups.map(group => {
+        console.log(group.name)
+        const groupUsers = group.getAllUsers()
+        groupUsers.map(user => console.log('\t', user.name, '(' + user.age + ')'))
+    })
+    callback()
+}
