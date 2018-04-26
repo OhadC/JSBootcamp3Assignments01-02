@@ -11,7 +11,7 @@ function createNewUser() {
         rl.question('Enter Password: \n', (password) => {
             rl.question('Enter Age: \n', (age) => {
                 db.users.createUser(uesrname, password, age)
-                controller()
+                showMenu()
             })
         })
     })
@@ -20,7 +20,7 @@ function createNewUser() {
 function deleteUser() {
     rl.question('Enter Username: \n', (uesrname) => {
         db.users.deleteUser(uesrname)
-        controller()
+        showMenu()
     })
 }
 
@@ -29,20 +29,20 @@ function printUsers() {
     for (let user of users) {
         console.log(user.name)
     }
-    controller()
+    showMenu()
 }
 
 function createNewgroup() {
     rl.question('Enter group name: \n', (groupName) => {
         db.groups.createGroup(groupName)
-        controller()
+        showMenu()
     })
 }
 
 function deleteGroup() {
     rl.question('Enter group name: \n', (groupName) => {
         db.groups.deleteGroup(groupName)
-        controller()
+        showMenu()
     })
 }
 
@@ -51,14 +51,14 @@ function printGroups() {
     for (let group of groups) {
         console.log(group.name)
     }
-    controller()
+    showMenu()
 }
 
 function addUserToGroup() {
     rl.question('Enter username: \n', (username) => {
         rl.question('Enter group name: \n', (groupName) => {
             db.groups.addUserToGroup(groupName, username)
-            controller()
+            showMenu()
         })
     })
 }
@@ -67,7 +67,7 @@ function removeUserFromGroup() {
     rl.question('Enter username: \n', (username) => {
         rl.question('Enter group name: \n', (groupName) => {
             db.groups.removeUserFromGroup(groupName, username)
-            controller()
+            showMenu()
         })
     })
 }
@@ -77,10 +77,10 @@ function printGroupsAndUsers() {
     for (let group of groups) {
         console.log(group.name)
         for (let user of group.users) {
-            console.log('/t', user.name, '(' + user.age + ')')
+            console.log('\t', user.name, '(' + user.age + ')')
         }
     }
-    controller()
+    showMenu()
 }
 
 const menus = {
@@ -152,41 +152,36 @@ const menus = {
     ]
 }
 
-function getMenuQuestion(menu) {
+function createMenuQuestion(menu) {
     return menu.reduce((prevStr, choice, index) => {
         return prevStr + '[' + (index + 1) + '] ' + choice.name + '\n'
     }, '')
 }
 
 function questionCallback(answer, prevMenu) {
-    let nextFunction = function () {
-        rl.question(getMenuQuestion(prevMenu), (answer) => {
-            questionCallback(answer, prevMenu)
-        })
-    }
-    if (!!+answer && +answer > 0 && +answer <= prevMenu.length) {
-        const selectdChoice = prevMenu[+answer - 1]
+    let nextFunction
+    answer = +answer
+    if (!!answer && answer > 0 && answer <= prevMenu.length) {
+        const selectdChoice = prevMenu[answer - 1]
         console.log(selectdChoice.name)
         if (selectdChoice['menu']) {
-            const currMenu = menus[selectdChoice.menu]
-            nextFunction = function () {
-                rl.question(getMenuQuestion(currMenu), (answer) => {
-                    questionCallback(answer, currMenu)
-                })
-            }
+            nextFunction = () => showMenu(selectdChoice.menu)
         } else {
             nextFunction = selectdChoice.function
         }
+    } else {
+        console.log('Wrong input! Try again:')
+        nextFunction = showMenu
     }
     nextFunction()
 }
 
-function controller() {
-    const currMenu = menus['main']
+function showMenu(menuName) {
+    const currMenu = menus[menuName || 'main']
 
-    rl.question(getMenuQuestion(currMenu), (answer) => {
+    rl.question(createMenuQuestion(currMenu), (answer) => {
         questionCallback(answer, currMenu)
     })
 }
 
-module.exports = controller
+module.exports = { showMenu }

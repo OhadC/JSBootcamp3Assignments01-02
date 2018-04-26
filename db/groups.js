@@ -30,12 +30,12 @@ class Groups {
         this.groups[groupId].removeUser(userName)
     }
     removeUserFromAllGroups(username){
-        for(group of groups){
+        for(group of this.groups){
             group.removeUser(userName)
         }
     }
     getIndex(groupName) {
-        return groups.findIndex(group => group.name === groupName)
+        return this.groups.findIndex(group => group.name === groupName)
     }
 }
 

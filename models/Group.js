@@ -5,23 +5,23 @@ module.exports = class Group {
     }
 
     addUser(user) {
-        if (getUserIndex(user.name) === -1) {
-            users.push(user)
+        if (this.getUserIndex(user.name) === -1) {
+            this.users.push(user)
             return true
         }
         return false
     }
 
     removeUser(userName) {
-        const userIndex = getUserIndex(userName)
+        const userIndex = this.getUserIndex(userName)
         if (userIndex !== -1) {
-            users.splice(userIndex, 1)
+            this.users.splice(userIndex, 1)
             return true
         }
         return false
     }
 
     getUserIndex(userName) {
-        return users.findIndex(user => user.name === userName)
+        return this.users.findIndex(user => user.name === userName)
     }
 }

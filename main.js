@@ -1,3 +1,3 @@
-const controller = require('./controller')
+const menu = require('./menu')
 
-controller()
+menu.showMenu()
