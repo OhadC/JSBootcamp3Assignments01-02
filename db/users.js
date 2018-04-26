@@ -1,5 +1,4 @@
 const User = require("./../models/User")
-const groups = require('./groups')
 
 class Users {
     constructor() {
@@ -36,7 +35,6 @@ class Users {
     }
     deleteUser(name) {
         if (name in this.users) {
-            groups.removeUserFromAllGroups(name)
             delete this.users[name]
             return true
         }
@@ -44,4 +42,4 @@ class Users {
     }
 }
 
-module.exports = new Users()
+module.exports = Users

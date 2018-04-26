@@ -1,5 +1,8 @@
 const readline = require('readline')
-const db = require('./db')
+const db = {
+    users: new (require('./db/users'))(),
+    groups: new (require('./db/groups'))()
+}
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -7,10 +10,10 @@ const rl = readline.createInterface({
 })
 
 function createNewUser() {
-    rl.question('Enter Username: \n', (uesrname) => {
+    rl.question('Enter Username: \n', (username) => {
         rl.question('Enter Password: \n', (password) => {
             rl.question('Enter Age: \n', (age) => {
-                db.users.createUser(uesrname, password, age)
+                db.users.createUser(username, password, age)
                 showMenu()
             })
         })
@@ -18,8 +21,10 @@ function createNewUser() {
 }
 
 function deleteUser() {
-    rl.question('Enter Username: \n', (uesrname) => {
-        db.users.deleteUser(uesrname)
+    rl.question('Enter Username: \n', (username) => {
+        if (db.users.deleteUser(username)) {
+            db.groups.removeUserFromAllGroups(username)
+        }
         showMenu()
     })
 }
@@ -55,7 +60,10 @@ function printGroups() {
 function addUserToGroup() {
     rl.question('Enter username: \n', (username) => {
         rl.question('Enter group name: \n', (groupName) => {
-            db.groups.addUserToGroup(groupName, username)
+            const user = db.users.getUser(username)
+            if (user) {
+                db.groups.addUserToGroup(groupName, user)
+            }
             showMenu()
         })
     })
