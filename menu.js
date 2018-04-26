@@ -25,10 +25,8 @@ function deleteUser() {
 }
 
 function printUsers() {
-    const users = db.users.users
-    for (let user of users) {
-        console.log(user.name)
-    }
+    const users = db.users.getAllUsers()
+    users.map(user => console.log(user.name))
     showMenu()
 }
 
@@ -47,10 +45,10 @@ function deleteGroup() {
 }
 
 function printGroups() {
-    const groups = db.groups.groups
-    for (let group of groups) {
+    const groups = db.groups.getAllGroups()
+    groups.map(group => {
         console.log(group.name)
-    }
+    })
     showMenu()
 }
 
@@ -73,13 +71,12 @@ function removeUserFromGroup() {
 }
 
 function printGroupsAndUsers() {
-    const groups = db.groups.groups
-    for (let group of groups) {
+    const groups = db.groups.getAllGroups()
+    groups.map(group => {
         console.log(group.name)
-        for (let user of group.users) {
-            console.log('\t', user.name, '(' + user.age + ')')
-        }
-    }
+        const groupUsers = group.getAllUsers()
+        groupUsers.map(user => console.log('\t', user.name, '(' + user.age + ')'))
+    })
     showMenu()
 }
 

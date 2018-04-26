@@ -3,39 +3,58 @@ const users = require('./Users')
 
 class Groups {
     constructor() {
-        this.groups = [] // TODO: return it to fucking object
+        this.groups = {} // {name: group, name: group}
     }
     createGroup(name) {
-        if (this.getIndex(name) === -1) {
-            this.groups.push(new Group(name))
+        if (!name in this.groups) {
+            this.groups[name] = new Group(name)
             return true
         }
         return false
     }
     deleteGroup(name) {
-        const groupIndex = this.getIndex(name)
-        if (groupIndex !== -1) {
-            this.groups.splice(groupIndex, 1)
+        if (name in this.groups) {
+            delete this.groups[name]
             return true
         }
         return false
     }
-    addUserToGroup(groupName, username) {
-        const user = users.getUserByName(username)
-        const groupId = this.getIndex(groupName)
-        this.groups[groupId].addUser(user)
+    addUserToGroup(groupName, userName) {
+        if (groupName in this.groups) {
+            const user = users.getUserByName(userName)
+            if (user) {
+                return this.groups[groupName].addUser(user)
+            }
+        }
+        return false
     }
     removeUserFromGroup(groupName, userName) {
-        const groupId = this.getIndex(groupName)
-        this.groups[groupId].removeUser(userName)
-    }
-    removeUserFromAllGroups(username){
-        for(group of this.groups){
-            group.removeUser(userName)
+        if (groupName in this.groups) {
+            if (user) {
+                return this.groups[groupName].removeUser(username)
+            }
         }
+        return false
     }
-    getIndex(groupName) {
-        return this.groups.findIndex(group => group.name === groupName)
+    removeUserFromAllGroups(userName) {
+        for (let groupName in this.groups) {
+            const currentGroup = this.groups[groupName]
+            removeUserFromGroup(groupName, userName)
+        }
+        return true
+    }
+    getGroup(name){
+        if (name in this.groups) {
+            return this.groups[name]
+        }
+        return null
+    }
+    getAllGroups(){
+        const groupsArr = []
+        for (let groupName in this.groups) {
+            groupsArr.push(this.groups[groupName])
+        }
+        return groupsArr
     }
 }
 

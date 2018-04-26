@@ -1,40 +1,46 @@
 const User = require("./../models/User")
+const groups = require('./groups')
 
 class Users {
     constructor() {
-        this.users = [] // TODO: return it to fucking object
+        this.users = {} // {username: user, username: user}
     }
 
     createUser(name, password, age) {
-        if (this.getIndex(name) === -1) {
-            this.users.push(new User(name, password, age))
+        if (!(name in this.users)) {
+            this.users[name] = new User(name, password, age)
             return true
         }
         return false
     }
-    updateUser(oldName, newName, newAge) {
-        const userIndex = this.getIndex(oldName)
-        if (userIndex !== -1 && this.getIndex(newName) === -1) {
-            this.users[userIndex].updateUser(newName, newAge)
+    updateUser(name, password, age) {
+        if (user in this.users) {
+            const user = this.users[name]
+            user.updateUser(password, age)
             return true
         }
         return false
     }
-    getUserByName(name){
-        const userIndex = this.getIndex(name)
-        return this.users[userIndex]
+    getUser(name) {
+        if (name in this.users) {
+            return this.users[name]
+        }
+        return null
+    }
+    getAllUsers() {
+        const usersArr = []
+        for (let name in this.users) {
+            usersArr.push(this.users[name])
+        }
+        return usersArr
     }
     deleteUser(name) {
-        const userIndex = this.getIndex(name)
-        if (userIndex !== -1) {
-            removeUserFromAllGroups(name)
-            this.users.splice(userIndex, 1)
+        if (name in this.users) {
+            groups.removeUserFromAllGroups(name)
+            delete this.users[name]
             return true
         }
         return false
-    }
-    getIndex(name) {
-        return this.users.findIndex(user => user.name === name)
     }
 }
 

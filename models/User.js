@@ -5,8 +5,8 @@ module.exports = class User {
         this.age = age
     }
 
-    updateUser(name, age) {
-        this.name = name
+    updateUser(password, age) {
+        this.password = password
         this.age = age
     }
 }
