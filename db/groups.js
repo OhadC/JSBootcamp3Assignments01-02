@@ -6,7 +6,7 @@ class Groups {
         this.groups = {} // {name: group, name: group}
     }
     createGroup(name) {
-        if (!name in this.groups) {
+        if (!(name in this.groups)) {
             this.groups[name] = new Group(name)
             return true
         }
