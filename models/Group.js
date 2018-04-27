@@ -22,7 +22,7 @@ module.exports = class Group {
 
     getAllUsers() {
         const usersArr = []
-        for (let userName in this.users) {
+        for (const userName in this.users) {
             usersArr.push(this.users[userName])
         }
         return usersArr

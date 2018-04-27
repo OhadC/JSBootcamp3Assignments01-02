@@ -1,3 +1,5 @@
+"use strict";
+
 (function init() {
 
     const readline = require('readline')
@@ -36,7 +38,7 @@
             if (selectdChoice['menu']) {
                 showMenu(selectdChoice.menu)
             } else {
-                selectdChoice.function(showMenu, rl, db)
+                selectdChoice.function(rl, db, showMenu)
             }
         } else {
             console.log('Wrong input! Try again:')
@@ -44,8 +46,8 @@
         }
     }
 
-    function addReturnToMainOption(menu){
-        for (let menuName in menu) {
+    function addReturnToMainOption(menu) {
+        for (const menuName in menu) {
             if (menuName !== 'main') {
                 menu[menuName].push({
                     name: 'Return to Main',

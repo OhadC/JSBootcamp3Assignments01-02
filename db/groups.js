@@ -31,7 +31,7 @@ class Groups {
         return false
     }
     removeUserFromAllGroups(userName) {
-        for (let groupName in this.groups) {
+        for (const groupName in this.groups) {
             const currentGroup = this.groups[groupName]
             this.removeUserFromGroup(groupName, userName)
         }
@@ -45,7 +45,7 @@ class Groups {
     }
     getAllGroups() {
         const groupsArr = []
-        for (let groupName in this.groups) {
+        for (const groupName in this.groups) {
             groupsArr.push(this.groups[groupName])
         }
         return groupsArr

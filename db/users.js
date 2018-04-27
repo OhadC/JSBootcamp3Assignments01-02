@@ -28,7 +28,7 @@ class Users {
     }
     getAllUsers() {
         const usersArr = []
-        for (let name in this.users) {
+        for (const name in this.users) {
             usersArr.push(this.users[name])
         }
         return usersArr

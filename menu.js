@@ -67,7 +67,7 @@ module.exports = menu = {
     ]
 }
 
-function createNewUser(callback, rl, db) {
+function createNewUser(rl, db, callback) {
     rl.question('Enter Username: \n', (username) => {
         rl.question('Enter Password: \n', (password) => {
             rl.question('Enter Age: \n', (age) => {
@@ -78,7 +78,7 @@ function createNewUser(callback, rl, db) {
     })
 }
 
-function deleteUser(callback, rl, db) {
+function deleteUser(rl, db, callback) {
     rl.question('Enter Username: \n', (username) => {
         if (db.users.deleteUser(username)) {
             db.groups.removeUserFromAllGroups(username) // ? console.log("Success!") : console.log("something went wrong!   ********")
@@ -87,27 +87,27 @@ function deleteUser(callback, rl, db) {
     })
 }
 
-function printUsers(callback, rl, db) {
+function printUsers(rl, db, callback) {
     const users = db.users.getAllUsers()
     users.map(user => console.log(user.name))
     callback()
 }
 
-function createNewgroup(callback, rl, db) {
+function createNewgroup(rl, db, callback) {
     rl.question('Enter group name: \n', (groupName) => {
         db.groups.createGroup(groupName) // ? console.log("Success!") : console.log("something went wrong!   ********")
         callback()
     })
 }
 
-function deleteGroup(callback, rl, db) {
+function deleteGroup(rl, db, callback) {
     rl.question('Enter group name: \n', (groupName) => {
         db.groups.deleteGroup(groupName) // ? console.log("Success!") : console.log("something went wrong!   ********")
         callback()
     })
 }
 
-function printGroups(callback, rl, db) {
+function printGroups(rl, db, callback) {
     const groups = db.groups.getAllGroups()
     groups.map(group => {
         console.log(group.name)
@@ -115,7 +115,7 @@ function printGroups(callback, rl, db) {
     callback()
 }
 
-function addUserToGroup(callback, rl, db) {
+function addUserToGroup(rl, db, callback) {
     rl.question('Enter username: \n', (username) => {
         rl.question('Enter group name: \n', (groupName) => {
             const user = db.users.getUser(username)
@@ -127,7 +127,7 @@ function addUserToGroup(callback, rl, db) {
     })
 }
 
-function removeUserFromGroup(callback, rl, db) {
+function removeUserFromGroup(rl, db, callback) {
     rl.question('Enter username: \n', (username) => {
         rl.question('Enter group name: \n', (groupName) => {
             db.groups.removeUserFromGroup(groupName, username) // ? console.log("Success!") : console.log("something went wrong!   ********")
@@ -136,7 +136,7 @@ function removeUserFromGroup(callback, rl, db) {
     })
 }
 
-function printGroupsAndUsers(callback, rl, db) {
+function printGroupsAndUsers(rl, db, callback) {
     const groups = db.groups.getAllGroups()
     groups.map(group => {
         console.log(group.name)
