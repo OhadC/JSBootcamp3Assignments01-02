@@ -10,6 +10,7 @@
         groups: new (require('./db/groups'))()
     }
     const menu = require('./menu')
+    addReturnToMainOption(menu)
 
     showMenu()
 
@@ -28,20 +29,29 @@
     }
 
     function questionCallback(answer, prevMenu) {
-        let nextFunction
         answer = +answer
         if (!!answer && answer > 0 && answer <= prevMenu.length) {
             const selectdChoice = prevMenu[answer - 1]
             console.log(selectdChoice.name)
             if (selectdChoice['menu']) {
-                nextFunction = () => showMenu(selectdChoice.menu)
+                showMenu(selectdChoice.menu)
             } else {
-                nextFunction = () => selectdChoice.function(showMenu, rl, db)
+                selectdChoice.function(showMenu, rl, db)
             }
         } else {
             console.log('Wrong input! Try again:')
-            nextFunction = showMenu
+            showMenu()
         }
-        nextFunction()
+    }
+
+    function addReturnToMainOption(menu){
+        for (let menuName in menu) {
+            if (menuName !== 'main') {
+                menu[menuName].push({
+                    name: 'Return to Main',
+                    menu: 'main'
+                })
+            }
+        }
     }
 })()
