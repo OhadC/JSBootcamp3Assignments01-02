@@ -1,67 +1,93 @@
-module.exports = menu = {
+function runMenu(menuObj, rl, db, currMenu) {
+    const currMenuObj = menuObj[currMenu || 'main']
+    rl.question(createMenuQuestion(currMenuObj), answer => {
+        answer = +answer
+        if (!answer || answer <= 0 || answer > currMenuObj.length) {
+            console.log('Wrong input! Try again:')
+            runMenu(menuObj, rl, db, currMenu)
+        } else {
+            const selectdMenu = currMenuObj[answer - 1]
+            console.log(selectdMenu.title)
+
+            if ('nextMenu' in selectdMenu) {
+                runMenu(menuObj, rl, db, selectdMenu.nextMenu)
+            } else {
+                selectdMenu.function(rl, db, () => runMenu(menuObj, rl, db))
+            }
+        }
+    })
+}
+
+function createMenuQuestion(menu) {
+    return menu.reduce((prevStr, choice, index) => {
+        return prevStr + '[' + (index + 1) + '] ' + choice.title + '\n'
+    }, '')
+}
+
+const menu = {
     main: [
         {
-            name: 'Users',
-            menu: 'users'
+            title: 'Users',
+            nextMenu: 'users'
         }, {
-            name: 'Groups',
-            menu: 'groups'
+            title: 'Groups',
+            nextMenu: 'groups'
         }, {
-            name: 'Users to Groups association',
-            menu: 'usersToGroups'
+            title: 'Users to Groups association',
+            nextMenu: 'usersToGroups'
         }
     ],
     users: [
         {
-            name: 'Create / delete users',
-            menu: 'createOrDeleteUser'
+            title: 'Create / delete users',
+            nextMenu: 'createOrDeleteUser'
         }, {
-            name: 'Get a list of users in the system (list of usernames)',
+            title: 'Get a list of users in the system (list of usernames)',
             function: printUsers
         }
     ],
     createOrDeleteUser: [
         {
-            name: 'Create user',
+            title: 'Create user',
             function: createNewUser
         }, {
-            name: 'Delete user',
+            title: 'Delete user',
             function: deleteUser
         }
     ],
     groups: [
         {
-            name: 'Create / delete groups',
-            menu: 'createOrDeleteGroups'
+            title: 'Create / delete groups',
+            nextMenu: 'createOrDeleteGroups'
         }, {
-            name: 'Get a list of groups in the system',
+            title: 'Get a list of groups in the system',
             function: printGroups
         }
     ],
     createOrDeleteGroups: [
         {
-            name: 'Create group',
+            title: 'Create group',
             function: createNewgroup
         }, {
-            name: 'Delete group',
+            title: 'Delete group',
             function: deleteGroup
         }
     ],
     usersToGroups: [
         {
-            name: 'Add / remove user to / from group',
-            menu: 'addOrRemoveFromGroup'
+            title: 'Add / remove user to / from group',
+            nextMenu: 'addOrRemoveFromGroup'
         }, {
-            name: 'Get a list of groups and users under each group',
+            title: 'Get a list of groups and users under each group',
             function: printGroupsAndUsers
         }
     ],
     addOrRemoveFromGroup: [
         {
-            name: 'Add user to group',
+            title: 'Add user to group',
             function: addUserToGroup
         }, {
-            name: 'Remove user to group',
+            title: 'Remove user to group',
             function: removeUserFromGroup
         }
     ]
@@ -145,3 +171,5 @@ function printGroupsAndUsers(rl, db, callback) {
     })
     callback()
 }
+
+module.exports = { runMenu, menu }
