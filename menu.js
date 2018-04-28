@@ -115,7 +115,7 @@ function deleteUser(rl, db, callback) {
 
 function printUsers(rl, db, callback) {
     const users = db.users.getAllUsers()
-    users.map(user => console.log(user.name))
+    users.forEach(user => console.log(user.name))
     callback()
 }
 
@@ -135,9 +135,7 @@ function deleteGroup(rl, db, callback) {
 
 function printGroups(rl, db, callback) {
     const groups = db.groups.getAllGroups()
-    groups.map(group => {
-        console.log(group.name)
-    })
+    groups.forEach(group =>  console.log(group.name))
     callback()
 }
 
@@ -164,10 +162,10 @@ function removeUserFromGroup(rl, db, callback) {
 
 function printGroupsAndUsers(rl, db, callback) {
     const groups = db.groups.getAllGroups()
-    groups.map(group => {
+    groups.forEach(group => {
         console.log(group.name)
         const groupUsers = group.getAllUsers()
-        groupUsers.map(user => console.log('\t', user.name, '(' + user.age + ')'))
+        groupUsers.forEach(user => console.log('\t', user.name, '(' + user.age + ')'))
     })
     callback()
 }
