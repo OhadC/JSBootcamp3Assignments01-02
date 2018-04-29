@@ -18,8 +18,8 @@ function runMenu(menuObj, rl, db, currMenu) {
     })
 }
 
-function createMenuQuestion(menu) {
-    return menu.reduce((prevStr, choice, index) => {
+function createMenuQuestion(currMenuObj) {
+    return currMenuObj.reduce((prevStr, choice, index) => {
         return prevStr + '[' + (index + 1) + '] ' + choice.title + '\n'
     }, '')
 }

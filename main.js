@@ -13,13 +13,18 @@
     }
 
     const { runMenu, menu } = require('./menu')
-    addReturnToMainOption(menu)
+    addOptionsToMenu(menu, rl, db)
 
     runMenu(menu, rl, db)
 
-    function addReturnToMainOption(menu) {
+    function addOptionsToMenu(menu, rl, db) {
         for (const menuName in menu) {
-            if (menuName !== 'main') {
+            if (menuName === 'main') {
+                menu[menuName].push({
+                    title: 'Exit',
+                    function: () => rl.close()
+                })
+            } else {
                 menu[menuName].push({
                     title: 'Return to Main',
                     nextMenu: 'main'
