@@ -23,7 +23,7 @@ module.exports = class Groups {
             throw new Error('User Allready in that group')
         }
     }
-    removeUserFromGroup(groupname, username) {
+    removeUserFromGroup(username, groupname) {
         if (!(groupname in this._groups)) {
             throw new Error('No group with that name')
         }

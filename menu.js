@@ -114,7 +114,7 @@ const menu = {
         function: addUserToGroup
     },
     removeUserFromGroup: {
-        title: 'Remove user to group',
+        title: 'Remove user from group',
         function: removeUserFromGroup
     }
 }
@@ -192,7 +192,7 @@ function addUserToGroup(callback) {
 
 function removeUserFromGroup(callback) {
     rl.question('Enter username: ', (username) => {
-        rl.question('Enter group name: ', (groupName) => {
+        rl.question('Enter group name: ', (groupname) => {
             try {
                 ChatController.removeUserFromGroup(username, groupname)
             } catch (e) {

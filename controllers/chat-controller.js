@@ -24,7 +24,7 @@ module.exports = class ChatController {
         this._chat.addUserToGroup(user, groupname)
     }
     removeUserFromGroup(username, groupname) {
-        this._groups.removeUserFromGroup(groupname, username)
+        this._chat.removeUserFromGroup(groupname, username)
     }
     deleteUser(username) {
         this._chat.deleteUser(username)
