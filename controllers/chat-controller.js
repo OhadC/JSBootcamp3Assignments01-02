@@ -21,7 +21,7 @@ module.exports = class ChatController {
     }
     addUserToGroup(username, groupname) {
         const user = this._chat.getUser(username)
-        this._chat.addUserToGroup(groupname, user)
+        this._chat.addUserToGroup(user, groupname)
     }
     removeUserFromGroup(username, groupname) {
         this._groups.removeUserFromGroup(groupname, username)
@@ -35,25 +35,31 @@ module.exports = class ChatController {
     }
     printUsers() {
         const users = this._chat.getUsers()
+        console.log()
         users.forEach(user => {
             console.log(user.getName())
         })
+        console.log()
     }
     printGroups() {
         const groups = this._chat.getGroups()
+        console.log()
         groups.forEach(group => {
             console.log(group.getName())
         })
+        console.log()
     }
     printGroupsAndUsers() {
         const groups = this._chat.getGroups()
+        console.log()
         groups.forEach(group => {
             console.log(group.getName())
             const users = group.getUsers()
             users.forEach(user => {
-                console.log(user.getName())
+                console.log('\t', user.getName())
             })
         })
+        console.log()
     }
 
     _validateUser(username, password, age) {
@@ -63,12 +69,14 @@ module.exports = class ChatController {
         if (!password.trim()) {
             throw new Error('You must enter Password')
         }
-        if (!isInteger(age.trim())) {
+        if (!age.trim()) {
             throw new Error('You must enter Age')
+        }
+        if (!isInteger(age.trim())) {
+            throw new Error('Age must be a number')
         }
     }
 }
-
 
 function isInteger(value) {
     return /^\d+$/.test(value);

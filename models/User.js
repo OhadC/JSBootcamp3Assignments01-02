@@ -2,7 +2,7 @@ module.exports = class User {
     constructor(name, password, age) {
         this._name = name.trim()
         this._password = password.trim()
-        this._age = age // TODO: int
+        this._age = age
     }
 
     getName() {

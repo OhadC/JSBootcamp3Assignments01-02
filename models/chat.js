@@ -13,6 +13,12 @@ module.exports = class Chat {
     getGroups() {
         return this._groups.getGroups()
     }
+    getUser(username){
+        return this._users.getUser(username)
+    }
+    getGroup(groupname){
+        return this._groups.getGroup(groupname)
+    }
 
     addUser(user) {
         this._users.addUser(user)
@@ -20,12 +26,8 @@ module.exports = class Chat {
     addGroup(group) {
         this._groups.addGroup(group)
     }
-    addUserToGroup(username, groupname) {
-        const user = this._users.getUser(username)
-        if (!user) {
-            throw new error('No user with that name')
-        }
-        this._groups.addUserToGroup(groupname, user)
+    addUserToGroup(user, groupname) {
+        this._groups.addUserToGroup(user, groupname)
     }
     removeUserFromGroup(username, groupname) {
         this._groups.removeUserFromGroup(groupname, username)

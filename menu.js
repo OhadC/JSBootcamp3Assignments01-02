@@ -35,8 +35,8 @@ function runMenu(currMenuName) {
             runMenu(currMenuName)
         } else {
             const selectdMenu = currMenu[answer - 1]
-            console.log(selectdMenu.title)
-
+            console.log(selectdMenu.name)
+            
             if ('nextMenu' in selectdMenu) {
                 runMenu(selectdMenu.nextMenu)
             } else {
@@ -122,9 +122,9 @@ const menu = {
 }
 
 function createNewUser(callback) {
-    rl.question('Enter Username: \n', (username) => {
-        rl.question('Enter Password: \n', (password) => {
-            rl.question('Enter Age: \n', (age) => {
+    rl.question('Enter Username: ', (username) => {
+        rl.question('Enter Password: ', (password) => {
+            rl.question('Enter Age: ', (age) => {
                 try {
                     ChatController.createNewUser(username, password, age)
                 } catch (e) {
@@ -137,7 +137,7 @@ function createNewUser(callback) {
 }
 
 function deleteUser(callback) {
-    rl.question('Enter Username: \n', (username) => {
+    rl.question('Enter Username: ', (username) => {
         try {
             ChatController.deleteUser(username)
         } catch (e) {
@@ -153,7 +153,7 @@ function printUsers(callback) {
 }
 
 function createNewgroup(callback) {
-    rl.question('Enter group name: \n', (groupname) => {
+    rl.question('Enter group name: ', (groupname) => {
         try {
             ChatController.createNewgroup(groupname)
         } catch (e) {
@@ -164,7 +164,7 @@ function createNewgroup(callback) {
 }
 
 function deleteGroup(callback) {
-    rl.question('Enter group name: \n', (groupname) => {
+    rl.question('Enter group name: ', (groupname) => {
         try {
             ChatController.deleteGroup(groupname)
         } catch (e) {
@@ -176,11 +176,12 @@ function deleteGroup(callback) {
 
 function printGroups(callback) {
     ChatController.printGroups()
+    callback()
 }
 
 function addUserToGroup(callback) {
-    rl.question('Enter username: \n', (username) => {
-        rl.question('Enter group name: \n', (groupname) => {
+    rl.question('Enter username: ', (username) => {
+        rl.question('Enter group name: ', (groupname) => {
             try {
                 ChatController.addUserToGroup(username, groupname)
             } catch (e) {
@@ -192,8 +193,8 @@ function addUserToGroup(callback) {
 }
 
 function removeUserFromGroup(callback) {
-    rl.question('Enter username: \n', (username) => {
-        rl.question('Enter group name: \n', (groupName) => {
+    rl.question('Enter username: ', (username) => {
+        rl.question('Enter group name: ', (groupName) => {
             try {
                 ChatController.removeUserFromGroup(username, groupname)
             } catch (e) {

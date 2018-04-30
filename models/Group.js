@@ -8,7 +8,7 @@ module.exports = class Group {
         return this._name
     }
     
-    getAllUsers() {
+    getUsers() {
         const usersArr = []
         for (const userName in this._users) {
             usersArr.push(this._users[userName])

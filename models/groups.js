@@ -15,7 +15,7 @@ module.exports = class Groups {
         }
         delete this._groups[groupname]
     }
-    addUserToGroup(groupname, user) {
+    addUserToGroup(user, groupname) {
         if (!(groupname in this._groups)) {
             throw new Error('No group with that name')
         }
