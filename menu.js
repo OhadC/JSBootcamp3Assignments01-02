@@ -11,114 +11,112 @@ module.exports = function initMenu() {
 }
 
 function addOptionsToMenu() {
+    menu['exit'] = {
+        title: 'Exit',
+        function: () => rl.close()
+    }
     for (const menuName in menu) {
         if (menuName === 'main') {
-            menu[menuName].push({
-                title: 'Exit',
-                function: () => rl.close()
-            })
-        } else {
-            menu[menuName].push({
-                title: 'Return to Main',
-                nextMenu: 'main'
-            })
+            menu[menuName].options.push('exit')
+        } else if ('options' in menu[menuName]) {
+            menu[menuName].options.push('main')
         }
     }
 }
 
 function runMenu(currMenuName) {
     const currMenu = menu[currMenuName || 'main']
+    console.log(currMenu.title)
     rl.question(createMenuQuestion(currMenu), answer => {
         answer = +answer
-        if (!answer || answer <= 0 || answer > currMenu.length) {
+        if (!answer || answer <= 0 || answer > currMenu.options.length) {
             console.log('Wrong input! Try again:')
             runMenu(currMenuName)
         } else {
-            const selectdMenu = currMenu[answer - 1]
-            console.log(selectdMenu.name)
-            
-            if ('nextMenu' in selectdMenu) {
-                runMenu(selectdMenu.nextMenu)
+            const selectdMenu = currMenu.options[answer - 1]
+            const selectdMenuItem = menu[selectdMenu]
+
+            if ('options' in selectdMenuItem) {
+                runMenu(selectdMenu)
             } else {
-                selectdMenu.function(runMenu)
+                console.log(selectdMenuItem.title)
+                selectdMenuItem.function(runMenu)
             }
         }
     })
 }
 
 function createMenuQuestion(currMenu) {
-    return currMenu.reduce((prevStr, choice, index) => {
-        return prevStr + '[' + (index + 1) + '] ' + choice.title + '\n'
+    return currMenu.options.reduce((prevStr, option, index) => {
+        return prevStr + '[' + (index + 1) + '] ' + menu[option].title + '\n'
     }, '')
 }
 
 const menu = {
-    main: [
-        {
-            title: 'Users',
-            nextMenu: 'users'
-        }, {
-            title: 'Groups',
-            nextMenu: 'groups'
-        }, {
-            title: 'Users to Groups association',
-            nextMenu: 'usersToGroups'
-        }
-    ],
-    users: [
-        {
-            title: 'Create / delete users',
-            nextMenu: 'createOrDeleteUser'
-        }, {
-            title: 'Get a list of users in the system (list of usernames)',
-            function: printUsers
-        }
-    ],
-    createOrDeleteUser: [
-        {
-            title: 'Create user',
-            function: createNewUser
-        }, {
-            title: 'Delete user',
-            function: deleteUser
-        }
-    ],
-    groups: [
-        {
-            title: 'Create / delete groups',
-            nextMenu: 'createOrDeleteGroups'
-        }, {
-            title: 'Get a list of groups in the system',
-            function: printGroups
-        }
-    ],
-    createOrDeleteGroups: [
-        {
-            title: 'Create group',
-            function: createNewgroup
-        }, {
-            title: 'Delete group',
-            function: deleteGroup
-        }
-    ],
-    usersToGroups: [
-        {
-            title: 'Add / remove user to / from group',
-            nextMenu: 'addOrRemoveFromGroup'
-        }, {
-            title: 'Get a list of groups and users under each group',
-            function: printGroupsAndUsers
-        }
-    ],
-    addOrRemoveFromGroup: [
-        {
-            title: 'Add user to group',
-            function: addUserToGroup
-        }, {
-            title: 'Remove user to group',
-            function: removeUserFromGroup
-        }
-    ]
+    main: {
+        title: 'Main menu',
+        options: ['users', 'groups', 'usersToGroups']
+    },
+    users: {
+        title: 'Users',
+        options: ['createOrDeleteUser', 'printUsers']
+    },
+    createOrDeleteUser: {
+        title: 'Create / delete users',
+        options: ['createNewUser', 'deleteUser']
+    },
+    groups: {
+        title: 'Groups',
+        options: ['createOrDeleteGroups', 'printGroups']
+    },
+    createOrDeleteGroups: {
+        title: 'Create / delete groups',
+        options: ['createNewgroup', 'deleteGroup']
+    },
+    usersToGroups: {
+        title: 'Users to Groups association',
+        options: ['addOrRemoveFromGroup', 'printGroupsAndUsers']
+    },
+    addOrRemoveFromGroup: {
+        title: 'Add / remove user to / from group',
+        options: ['addUserToGroup', 'removeUserFromGroup']
+    },
+    printUsers: {
+        title: 'Get a list of users in the system (list of usernames)',
+        function: printUsers
+    },
+    createNewUser: {
+        title: 'Create user',
+        function: createNewUser
+    },
+    deleteUser: {
+        title: 'Delete user',
+        function: deleteUser
+    },
+    printGroups: {
+        title: 'Get a list of groups in the system',
+        function: printGroups
+    },
+    createNewgroup: {
+        title: 'Create group',
+        function: createNewgroup
+    },
+    deleteGroup: {
+        title: 'Delete group',
+        function: deleteGroup
+    },
+    printGroupsAndUsers: {
+        title: 'Get a list of groups and users under each group',
+        function: printGroupsAndUsers
+    },
+    addUserToGroup: {
+        title: 'Add user to group',
+        function: addUserToGroup
+    },
+    removeUserFromGroup: {
+        title: 'Remove user to group',
+        function: removeUserFromGroup
+    }
 }
 
 function createNewUser(callback) {

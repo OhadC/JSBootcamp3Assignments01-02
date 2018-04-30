@@ -32,6 +32,7 @@ module.exports = class Chat {
     removeUserFromGroup(username, groupname) {
         this._groups.removeUserFromGroup(groupname, username)
     }
+    
     deleteUser(username) {
         this._users.deleteUser(username)
         this._groups.removeUserFromAllGroups(username)

@@ -17,8 +17,8 @@ module.exports = class Group {
     }
 
     addUser(user) {
-        if (!(user.name in this._users)) {
-            this._users[user.name] = user
+        if (!(user.getName() in this._users)) {
+            this._users[user.getName()] = user
             return true
         }
         return false

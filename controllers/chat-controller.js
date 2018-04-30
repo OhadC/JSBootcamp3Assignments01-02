@@ -27,38 +27,49 @@ module.exports = class ChatController {
         this._groups.removeUserFromGroup(groupname, username)
     }
     deleteUser(username) {
-        this._users.deleteUser(username)
-        this._groups.removeUserFromAllGroups(username)
+        this._chat.deleteUser(username)
     }
     deleteGroup(groupname) {
-        this._groups.deleteGroup(groupname)
+        this._chat.deleteGroup(groupname)
     }
     printUsers() {
         const users = this._chat.getUsers()
         console.log()
-        users.forEach(user => {
-            console.log(user.getName())
-        })
+        if (!users.length) {
+            console.log('There is no users')
+        } else {
+            users.forEach(user => {
+                console.log(user.getName())
+            })
+        }
         console.log()
     }
     printGroups() {
         const groups = this._chat.getGroups()
         console.log()
-        groups.forEach(group => {
-            console.log(group.getName())
-        })
+        if (!groups.length) {
+            console.log('There is no groups')
+        } else {
+            groups.forEach(group => {
+                console.log(group.getName())
+            })
+        }
         console.log()
     }
     printGroupsAndUsers() {
         const groups = this._chat.getGroups()
         console.log()
-        groups.forEach(group => {
-            console.log(group.getName())
-            const users = group.getUsers()
-            users.forEach(user => {
-                console.log('\t', user.getName())
+        if (!groups.length) {
+            console.log('There is no groups')
+        } else {
+            groups.forEach(group => {
+                console.log(group.getName())
+                const users = group.getUsers()
+                users.forEach(user => {
+                    console.log('\t', user.getName(), '(' + user.getAge() + ")")
+                })
             })
-        })
+        }
         console.log()
     }
 

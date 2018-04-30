@@ -26,10 +26,10 @@ module.exports = class Users {
         user.updateUser(password, age)
     }
     getUser(username) {
-        if (username in this._users) {
-            return this._users[username]
+        if (!(username in this._users)) {
+            throw new Error('No user with that name')
         }
-        return null
+        return this._users[username]
     }
     deleteUser(username) {
         if (!(username in this._users)) {
