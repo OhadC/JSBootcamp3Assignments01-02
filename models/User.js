@@ -1,12 +1,22 @@
 module.exports = class User {
     constructor(name, password, age) {
-        this.name = name
-        this.password = password
-        this.age = age
+        this._name = name.trim()
+        this._password = password.trim()
+        this._age = age // TODO: int
+    }
+
+    getName() {
+        return this._name
+    }
+    getPassword() {
+        return this._password
+    }
+    getAge() {
+        return this._age
     }
 
     updateUser(password, age) {
-        this.password = password
-        this.age = age
+        this._password = password
+        this._age = age
     }
 }

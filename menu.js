@@ -1,25 +1,53 @@
-function runMenu(menuObj, rl, db, currMenu) {
-    const currMenuObj = menuObj[currMenu || 'main']
-    rl.question(createMenuQuestion(currMenuObj), answer => {
-        answer = +answer
-        if (!answer || answer <= 0 || answer > currMenuObj.length) {
-            console.log('Wrong input! Try again:')
-            runMenu(menuObj, rl, db, currMenu)
+const readline = require('readline')
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+})
+const ChatController = new (require('./controllers/chat-controller'))()
+
+module.exports = function initMenu() {
+    addOptionsToMenu()
+    runMenu()
+}
+
+function addOptionsToMenu() {
+    for (const menuName in menu) {
+        if (menuName === 'main') {
+            menu[menuName].push({
+                title: 'Exit',
+                function: () => rl.close()
+            })
         } else {
-            const selectdMenu = currMenuObj[answer - 1]
+            menu[menuName].push({
+                title: 'Return to Main',
+                nextMenu: 'main'
+            })
+        }
+    }
+}
+
+function runMenu(currMenuName) {
+    const currMenu = menu[currMenuName || 'main']
+    rl.question(createMenuQuestion(currMenu), answer => {
+        answer = +answer
+        if (!answer || answer <= 0 || answer > currMenu.length) {
+            console.log('Wrong input! Try again:')
+            runMenu(currMenuName)
+        } else {
+            const selectdMenu = currMenu[answer - 1]
             console.log(selectdMenu.title)
 
             if ('nextMenu' in selectdMenu) {
-                runMenu(menuObj, rl, db, selectdMenu.nextMenu)
+                runMenu(selectdMenu.nextMenu)
             } else {
-                selectdMenu.function(rl, db, () => runMenu(menuObj, rl, db))
+                selectdMenu.function(runMenu)
             }
         }
     })
 }
 
-function createMenuQuestion(currMenuObj) {
-    return currMenuObj.reduce((prevStr, choice, index) => {
+function createMenuQuestion(currMenu) {
+    return currMenu.reduce((prevStr, choice, index) => {
         return prevStr + '[' + (index + 1) + '] ' + choice.title + '\n'
     }, '')
 }
@@ -93,81 +121,90 @@ const menu = {
     ]
 }
 
-function createNewUser(rl, db, callback) {
+function createNewUser(callback) {
     rl.question('Enter Username: \n', (username) => {
         rl.question('Enter Password: \n', (password) => {
             rl.question('Enter Age: \n', (age) => {
-                db.users.createUser(username, password, age)
+                try {
+                    ChatController.createNewUser(username, password, age)
+                } catch (e) {
+                    console.log(e.message)
+                }
                 callback()
             })
         })
     })
 }
 
-function deleteUser(rl, db, callback) {
+function deleteUser(callback) {
     rl.question('Enter Username: \n', (username) => {
-        if (db.users.deleteUser(username)) {
-            db.groups.removeUserFromAllGroups(username) // ? console.log("Success!") : console.log("something went wrong!   ********")
+        try {
+            ChatController.deleteUser(username)
+        } catch (e) {
+            console.log(e.message)
         }
         callback()
     })
 }
 
-function printUsers(rl, db, callback) {
-    const users = db.users.getAllUsers()
-    users.forEach(user => console.log(user.name))
+function printUsers(callback) {
+    ChatController.printUsers()
     callback()
 }
 
-function createNewgroup(rl, db, callback) {
-    rl.question('Enter group name: \n', (groupName) => {
-        db.groups.createGroup(groupName) // ? console.log("Success!") : console.log("something went wrong!   ********")
+function createNewgroup(callback) {
+    rl.question('Enter group name: \n', (groupname) => {
+        try {
+            ChatController.createNewgroup(groupname)
+        } catch (e) {
+            console.log(e.message)
+        }
         callback()
     })
 }
 
-function deleteGroup(rl, db, callback) {
-    rl.question('Enter group name: \n', (groupName) => {
-        db.groups.deleteGroup(groupName) // ? console.log("Success!") : console.log("something went wrong!   ********")
+function deleteGroup(callback) {
+    rl.question('Enter group name: \n', (groupname) => {
+        try {
+            ChatController.deleteGroup(groupname)
+        } catch (e) {
+            console.log(e.message)
+        }
         callback()
     })
 }
 
-function printGroups(rl, db, callback) {
-    const groups = db.groups.getAllGroups()
-    groups.forEach(group =>  console.log(group.name))
-    callback()
+function printGroups(callback) {
+    ChatController.printGroups()
 }
 
-function addUserToGroup(rl, db, callback) {
+function addUserToGroup(callback) {
     rl.question('Enter username: \n', (username) => {
-        rl.question('Enter group name: \n', (groupName) => {
-            const user = db.users.getUser(username)
-            if (user) {
-                db.groups.addUserToGroup(groupName, user) // ? console.log("Success!") : console.log("something went wrong!   ********")
+        rl.question('Enter group name: \n', (groupname) => {
+            try {
+                ChatController.addUserToGroup(username, groupname)
+            } catch (e) {
+                console.log(e.message)
             }
             callback()
         })
     })
 }
 
-function removeUserFromGroup(rl, db, callback) {
+function removeUserFromGroup(callback) {
     rl.question('Enter username: \n', (username) => {
         rl.question('Enter group name: \n', (groupName) => {
-            db.groups.removeUserFromGroup(groupName, username) // ? console.log("Success!") : console.log("something went wrong!   ********")
+            try {
+                ChatController.removeUserFromGroup(username, groupname)
+            } catch (e) {
+                console.log(e.message)
+            }
             callback()
         })
     })
 }
 
-function printGroupsAndUsers(rl, db, callback) {
-    const groups = db.groups.getAllGroups()
-    groups.forEach(group => {
-        console.log(group.name)
-        const groupUsers = group.getAllUsers()
-        groupUsers.forEach(user => console.log('\t', user.name, '(' + user.age + ')'))
-    })
+function printGroupsAndUsers(callback) {
+    ChatController.printGroupsAndUsers()
     callback()
 }
-
-module.exports = { runMenu, menu }
