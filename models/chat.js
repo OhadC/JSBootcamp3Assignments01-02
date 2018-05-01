@@ -16,8 +16,8 @@ module.exports = class Chat {
     getUser(username){
         return this._users.getUser(username)
     }
-    getGroup(groupname){
-        return this._groups.getGroup(groupname)
+    getGroup(groupName){
+        return this._groups.getGroup(groupName)
     }
 
     addUser(user) {
@@ -26,18 +26,18 @@ module.exports = class Chat {
     addGroup(group) {
         this._groups.addGroup(group)
     }
-    addUserToGroup(user, groupname) {
-        this._groups.addUserToGroup(user, groupname)
+    addUserToGroup(user, groupName) { // TODO: should be removed
+        this._groups.addUserToGroup(user, groupName)
     }
-    removeUserFromGroup(username, groupname) {
-        this._groups.removeUserFromGroup(groupname, username)
+    removeUserFromGroup(username, groupName) { // TODO: should be removed
+        this._groups.removeUserFromGroup(groupName, username)
     }
     
     deleteUser(username) {
         this._users.deleteUser(username)
         this._groups.removeUserFromAllGroups(username)
     }
-    deleteGroup(groupname) {
-        this._groups.deleteGroup(groupname)
+    deleteGroup(groupName) {
+        this._groups.deleteGroup(groupName)
     }
 }

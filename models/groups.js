@@ -1,52 +1,49 @@
 module.exports = class Groups {
     constructor() {
-        this._groups = {} // {name: group, name: group}
+        this._groups = []
+    }
+
+    getGroups() {
+        return this._groups
+    }
+
+    getGroup(groupName) {
+        const groupIndex = this.getIndexByName(groupName)
+        if (groupIndex === -1) throw new Error('No group with that name')
+        return this._groups[groupIndex]
     }
     addGroup(group) {
-        const groupname = group.getName()
-        if (groupname in this._groups) {
-            throw new Error('Group with that name Already Exists')
-        }
-        this._groups[groupname] = group
+        this._groups.push(group)
     }
-    deleteGroup(groupname) {
-        if (!(groupname in this._groups)) {
+    deleteGroup(groupName) {
+        const groupIndex = this.getIndexByName(groupName)
+        if (groupIndex === -1) throw new Error('No group with that name')
+        this._groups.splice(groupIndex, 1)
+    }
+    addUserToGroup(user, groupName) {
+        const groupIndex = this.getIndexByName(groupName)
+        if (groupIndex === -1) throw new Error('No group with that name')
+        if (!(this._groups[groupIndex].addUser(user))) throw new Error('User Already in that group')
+    }
+    removeUserFromGroup(username, groupName) { // TODO: should be removed
+        if (!(groupName in this._groups)) {
             throw new Error('No group with that name')
         }
-        delete this._groups[groupname]
-    }
-    addUserToGroup(user, groupname) {
-        if (!(groupname in this._groups)) {
-            throw new Error('No group with that name')
-        }
-        if (!(this._groups[groupname].addUser(user))) {
-            throw new Error('User Allready in that group')
-        }
-    }
-    removeUserFromGroup(username, groupname) {
-        if (!(groupname in this._groups)) {
-            throw new Error('No group with that name')
-        }
-        if (!(this._groups[groupname].removeUser(username))) {
+        if (!(this._groups[groupName].removeUser(username))) {
             throw new Error('No user with that name')
         }
     }
     removeUserFromAllGroups(username) {
-        for (const groupname in this._groups) {
-            this._groups[groupname].removeUser(username)
+        for (const groupName in this._groups) {
+            this._groups[groupName].removeUser(username)
         }
     }
-    getGroup(groupname) {
-        if (groupname in this._groups) {
-            return this._groups[groupname]
-        }
-        return null
+
+
+    getIndexById(groupId) {
+        return this._groups.findIndex(group => group.getId() === groupId)
     }
-    getGroups() {
-        const groupsArr = []
-        for (const groupname in this._groups) {
-            groupsArr.push(this._groups[groupname])
-        }
-        return groupsArr
+    getIndexByName(groupName) {
+        return this._groups.findIndex(group => group.getName() === groupName)
     }
 }

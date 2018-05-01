@@ -1,40 +1,38 @@
 module.exports = class Users {
     constructor() {
-        this._users = {} // {username: user, username: user}
+        this._users = []
     }
 
     getUsers() {
-        const usersArr = []
-        for (const name in this._users) {
-            usersArr.push(this._users[name])
-        }
-        return usersArr
+        return this._users
     }
 
-    addUser(user) {
-        const username = user.getName()
-        if (username in this._users) {
-            throw new Error('User with that name Already Exists')
-        }
-        this._users[username] = user
+    addUser(newUser) {
+        if (this.getIndexByName(newUser.getName()) !== -1) throw new Error('User with that name Already Exists')
+        this._users.push(newUser)
     }
-    updateUser(username, password, age) {
-        if (!(username in this._users)) {
-            throw new Error('No user with that name')
-        }
-        const user = this._users[username]
-        user.updateUser(password, age)
+    updateUser(username, newPassword, newAge) {
+        const userIndex = this.getIndexByName(username)
+        if (userIndex === -1) throw new Error('No user with that name')
+        const user = this._users[userIndex]
+        user.setPassword(newPassword)
+        user.setAge(newAge)
     }
     getUser(username) {
-        if (!(username in this._users)) {
-            throw new Error('No user with that name')
-        }
-        return this._users[username]
+        const userIndex = this.getIndexByName(username)
+        if (userIndex === -1) throw new Error('No user with that name')
+        return this._users[userIndex]
     }
     deleteUser(username) {
-        if (!(username in this._users)) {
-            throw new Error('No user with that name')
-        }
-        delete this._users[username]
+        const userIndex = this.getIndexByName(username)
+        if (userIndex === -1) throw new Error('No user with that name')
+        this._users.splice(userIndex, 1)
+    }
+
+    getIndexById(userId) {
+        return this._users.findIndex(user => user.getId() === userId)
+    }
+    getIndexByName(username) {
+        return this._users.findIndex(user => user.getName() === username)
     }
 }
