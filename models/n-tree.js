@@ -11,18 +11,22 @@ module.exports.NTree = class NTree {
         this._roots.push(nodeToAdd)
     }
     search(comparator, currNode) {
+        const foundedNodes = []
         let currNodeChilds
-        if (!currNode) {
-            currNodeChilds = this._roots
+        if (currNode) {
+            currNodeChilds = currNode.getCilds()
+            if (comparator(currNode)){
+                foundedNodes.push(currNode)
+            }
         } else {
-            if (comparator(currNode)) return currNode
-            const currNodeChilds = currNode.getCilds()
+            currNodeChilds = this._roots
         }
+        
         for (let i = 0; i < currNodeChilds.length; i++) {
             const result = search(currNodeChilds[i])
-            if (result) return result
+            foundedNodes.push(...result)
         }
-        return null
+        return foundedNodes
     }
     flattening(currNode) {
         let currNodeChilds
@@ -33,7 +37,7 @@ module.exports.NTree = class NTree {
         }
         currNodeChilds.forEach(child => {
             flattening(child)
-            child.flattening()
+            child.flattening()  // TODO: should get from outside
         })
     }
 }
@@ -78,7 +82,7 @@ module.exports.Node = class Node {
             return newPath
         }
     }
-    flattening() {
+    flattening() {  // TODO: should be in controller
         if (this._childs.length === 1 && this._childs[0].getCilds().length === 0) {
             const nodeToDelete = this._childs[0]
             const usersToAdd = nodeToDelete.getData().getUsers()
