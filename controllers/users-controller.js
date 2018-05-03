@@ -5,6 +5,10 @@ class UsersController {
     constructor(users) {
         this._users = users
 
+        this.listeners = {
+            userDeleted: []
+        }
+
         this.menu = {
             users: {
                 title: 'Users',
@@ -35,10 +39,14 @@ class UsersController {
             const username = answers[0]
             const password = answers[1]
             const age = answers[2]
-            this._validateUser(username, password, age)
-            const newUser = new User(username, password, parseInt(age))
-            this._users.addUser(newUser)
-            callback()
+            if (!this._validateUser(username, password, age)) {
+                this.createNewUser(callback)
+            }
+            else {
+                const newUser = new User(username, password, parseInt(age))
+                this._users.addUser(newUser)
+                callback()
+            }
         })
     }
 
@@ -46,7 +54,9 @@ class UsersController {
         const questionsArray = ['Enter Username: ']
         menuView.getInput(questionsArray, answers => {
             const username = answers[0]
-            this._users.deleteUser(username)
+            if (this._users.deleteUser(username)) {
+                this.trigger('userDeleted', username)
+            }
             callback()
         })
     }
@@ -66,21 +76,46 @@ class UsersController {
     }
 
     _validateUser(username, password, age) {
+        console.log()
         if (!username.trim()) {
-            throw new Error('You must enter User name')
+            console.log('You must enter User name')
+            return false
         }
         if (!password.trim()) {
-            throw new Error('You must enter Password')
+            console.log('You must enter Password')
+            return false
         }
         if (!age.trim()) {
-            throw new Error('You must enter Age')
+            console.log('You must enter Age')
+            return false
         }
         if (!this._isInteger(age.trim())) {
-            throw new Error('Age must be a number')
+            console.log('Age must be a number')
+            return false
+        }
+        return true
+    }
+
+    _isInteger(value) {
+        return /^\d+$/.test(value)
+    }
+
+    on(eventName, handler) {
+        if (this.listeners[eventName]) {
+            this.listeners[eventName].push(handler)
+        } else {
+            this.listeners[eventName] = handler
         }
     }
-    _isInteger(value) {
-        return /^\d+$/.test(value);
+
+    trigger(eventName, data) {
+        if (this.listeners[eventName] && this.listeners[eventName].length) {
+            this.listeners[eventName].forEach(handler => {
+                if (!!handler && typeof handler === 'function') {
+                    handler(data)
+                }
+            })
+        }
     }
 }
 

@@ -2,9 +2,11 @@ const Group = require('../models/group')
 const menuView = require('../views/menu-view')
 
 class GroupsController {
-    constructor(users, groups) {
+    constructor(users, groups, usersController) {
         this._users = users
         this._groups = groups
+
+        usersController.on('userDeleted', this._groups.removeUserFromAllGroups.bind(this._groups))
 
         this.menu = {
             groups: {
@@ -55,15 +57,17 @@ class GroupsController {
         menuView.getInput(questionsArray, answers => {
             const groupname = answers[0]
             if (!groupname.trim()) {
-                throw new Error('You must enter group name')
+                console.log('You must enter group name')
+                this.createNewgroup(callback)
+            } else {
+                const newGroup = new Group(groupname)
+                this._groups.addGroup(newGroup)
+                callback()
             }
-            const newGroup = new Group(groupname)
-            this._groups.addGroup(newGroup)
-            callback()
         })
     }
 
-    addUserToGroup(username, groupname) {
+    addUserToGroup(username, groupname) {       // TODO: need more validations
         const questionsArray = ['Enter username: ', 'Enter group name: ']
         menuView.getInput(questionsArray, answers => {
             const username = answers[0]

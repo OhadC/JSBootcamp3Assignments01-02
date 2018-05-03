@@ -8,8 +8,8 @@ module.exports = class MainController {
     constructor() {
         this._users = new Users()
         this._groups = new Groups()
-        this._usersController = new UsersController(this._users) // need to get view - does it really have to..?
-        this._groupsController = new GroupsController(this._users, this._groups)
+        this._usersController = new UsersController(this._users)
+        this._groupsController = new GroupsController(this._users, this._groups, this._usersController)
 
         this.menu = {
             main: {
