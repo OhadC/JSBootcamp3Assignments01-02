@@ -1,6 +1,4 @@
-let idCounter = 0
-
-module.exports = class Group {
+class Group {
     constructor(name) {
         this._id = idCounter++  // unique
         this._name = name       // not unique
@@ -26,6 +24,7 @@ module.exports = class Group {
         const userIndex = this.getIndexByName(userName)
         if (userIndex === -1) return false
         this._users.splice(userIndex, 1)
+        return true
     }
 
     getIndexById(userId) {
@@ -35,3 +34,7 @@ module.exports = class Group {
         return this._users.findIndex(user => user.getName() === username)
     }
 }
+
+Group.idCounter = 0
+
+module.exports =  Group

@@ -1,4 +1,4 @@
-module.exports = class Groups {
+class Groups {
     constructor() {
         this._groups = []
     }
@@ -9,36 +9,30 @@ module.exports = class Groups {
 
     getGroup(groupName) {
         const groupIndex = this.getIndexByName(groupName)
-        if (groupIndex === -1) throw new Error('No group with that name')
+        if (groupIndex === -1) return null
         return this._groups[groupIndex]
     }
     addGroup(group) {
         this._groups.push(group)
+        return true
     }
     deleteGroup(groupName) {
         const groupIndex = this.getIndexByName(groupName)
-        if (groupIndex === -1) throw new Error('No group with that name')
+        if (groupIndex === -1) return false
         this._groups.splice(groupIndex, 1)
+        return true
     }
     addUserToGroup(user, groupName) {
         const groupIndex = this.getIndexByName(groupName)
-        if (groupIndex === -1) throw new Error('No group with that name')
-        if (!(this._groups[groupIndex].addUser(user))) throw new Error('User Already in that group')
+        return groupIndex !== -1 && this._groups[groupIndex].addUser(user)
     }
-    removeUserFromGroup(username, groupName) { // TODO: should be removed
-        if (!(groupName in this._groups)) {
-            throw new Error('No group with that name')
-        }
-        if (!(this._groups[groupName].removeUser(username))) {
-            throw new Error('No user with that name')
-        }
+    removeUserFromGroup(username, groupName) {
+        const groupIndex = this.getIndexByName(groupName)
+        return groupIndex !== -1 && this._groups[groupName].removeUser(username)
     }
     removeUserFromAllGroups(username) {
-        for (const groupName in this._groups) {
-            this._groups[groupName].removeUser(username)
-        }
+        this._groups.forEach(group => this._groups[groupName].removeUser(username))
     }
-
 
     getIndexById(groupId) {
         return this._groups.findIndex(group => group.getId() === groupId)
@@ -47,3 +41,5 @@ module.exports = class Groups {
         return this._groups.findIndex(group => group.getName() === groupName)
     }
 }
+
+module.exports = Groups

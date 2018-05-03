@@ -1,52 +1,8 @@
-module.exports.NTree = class NTree {
-    constructor() {
-        this._roots = []
-    }
-
-    getToots() {
-        return this._roots
-    }
-
-    addToRoot(nodeToAdd) {
-        this._roots.push(nodeToAdd)
-    }
-    search(comparator, currNode) {
-        const foundedNodes = []
-        let currNodeChilds
-        if (currNode) {
-            currNodeChilds = currNode.getCilds()
-            if (comparator(currNode)){
-                foundedNodes.push(currNode)
-            }
-        } else {
-            currNodeChilds = this._roots
-        }
-        
-        for (let i = 0; i < currNodeChilds.length; i++) {
-            const result = search(currNodeChilds[i])
-            foundedNodes.push(...result)
-        }
-        return foundedNodes
-    }
-    flattening(currNode) {
-        let currNodeChilds
-        if (!currNode) {
-            currNodeChilds = this._roots
-        } else {
-            const currNodeChilds = currNode.getCilds()
-        }
-        currNodeChilds.forEach(child => {
-            flattening(child)
-            child.flattening()  // TODO: should get from outside
-        })
-    }
-}
-
-module.exports.Node = class Node {
+class Node {
     constructor(data, parent) {
-        this._data = data // Group
+        this._data = data
         this._parent = parent
-        this._childs = []
+        this._childrens = {}
     }
 
     getData() {
@@ -54,39 +10,66 @@ module.exports.Node = class Node {
     }
     setData(newData) {
         this._data = newData
+        return true
     }
     getParent() {
         return this._parent
     }
-    setParent(newParent) {
-        this._parent = newParent
-    }
-    getCilds() {
-        return this._childs
+    getCildrens() {
+        return Object.values(this._childrens)
     }
 
-    addChild(newChild) {
-        this._childs.push(newChild)
-    }
-    removeChilds(comparator) {
-        this._childs = this._childs.filter(child => !comparator(child))
-    }
-    getPathToNode(childsPath) {
-        if (!childsPath) {
-            childsPath = []
+    getChildren(key) {
+        if (!(key in this._childrens)) {
+            return null
         }
-        const newPath = [...childsPath, this]
+        return this._childrens[key]
+    }
+    addChildren(key, newChildren) {
+        if (key in this._childrens) {
+            return false
+        }
+        this._childrens[key] = newChildren
+        return true
+    }
+    removeChildren(key) {
+        if (!(key in this._childrens)) {
+            return false
+        }
+        delete this._childrens[key]
+        return true
+    }
+    getPath(childrensPath) {
+        if (!childrensPath) {
+            childrensPath = []
+        }
+        const newPath = [...childrensPath, this]
         if (this._parent) {
-            return this.getPathToNode(newPath)
+            return this.getPath(newPath) // tail recursion
         } else {
             return newPath
         }
     }
-    flattening() {  // TODO: should be in controller
-        if (this._childs.length === 1 && this._childs[0].getCilds().length === 0) {
-            const nodeToDelete = this._childs[0]
-            const usersToAdd = nodeToDelete.getData().getUsers()
-            this._data.push(...usersToAdd)
+    search(comparator) {
+        const foundedNodes = []
+        if (comparator(this)) {
+            foundedNodes.push(this)
         }
+        Object.keys(this._childrens).forEach(key => {
+            const result = this._childrens[key].search(comparator)
+            foundedNodes.push(...result)
+        })
+        return foundedNodes
+    }
+    flattening(flatteningStrategy) {
+        if (this._childrens.length === 1) {
+            flatteningStrategy(this)
+            this.flattening(flatteningStrategy)
+        }
+        Object.keys(this._childrens).forEach(key => {
+            flattening(flatteningStrategy, this._childrens[key])
+        })
     }
 }
+
+module.exports = Node

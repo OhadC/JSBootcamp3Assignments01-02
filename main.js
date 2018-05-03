@@ -1,7 +1,8 @@
 "use strict";
 
 (function init() {
-    const initMenu = require('./menu')
+    const MainController = require('./controllers/main-controller')
 
-    initMenu()
+    const mainController = new MainController()
+    mainController.init()
 })()

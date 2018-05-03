@@ -1,9 +1,7 @@
-let idCounter = 0
-
-module.exports = class User {
+class User {
     constructor(name, password, age) {
-        this._id = idCounter++  // unique
-        this._name = name       // unique
+        this._id = User.idCounter++     // unique
+        this._name = name               // unique
         this._password = password
         this._age = age
     }
@@ -27,3 +25,7 @@ module.exports = class User {
         this._age = newAge
     }
 }
+
+User.idCounter = 0
+
+module.exports = User
