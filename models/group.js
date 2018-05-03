@@ -1,7 +1,7 @@
 class Group {
     constructor(name) {
-        this._id = idCounter++  // unique
-        this._name = name       // not unique
+        this._id = Group.idCounter++    // unique
+        this._name = name               // not unique
         this._users = []
     }
 
