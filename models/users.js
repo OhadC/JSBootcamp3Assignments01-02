@@ -1,42 +1,32 @@
 class Users {
     constructor() {
-        this._users = [] // TODO: object
+        this._users = {}
     }
 
     getUsers() {
-        return this._users
+        return Object.values(this._users)
     }
 
     addUser(newUser) {
-        if (this.getIndexByName(newUser.getName()) !== -1) return false
-        this._users.push(newUser)
+        if (this._users[newUser.getName()]) return false
+        this._users[newUser.getName()] = newUser
         return true
     }
     updateUser(username, newPassword, newAge) {
-        const userIndex = this.getIndexByName(username)
-        if (userIndex === -1) return false
-        const user = this._users[userIndex]
+        const user = this._users[username]
+        if(!user) return false
         user.setPassword(newPassword)
         user.setAge(newAge)
         return true
     }
     getUser(username) {
-        const userIndex = this.getIndexByName(username)
-        if (userIndex === -1) return null
-        return this._users[userIndex]
+        const user = this._users[username]
+        return user || null
     }
     deleteUser(username) {
-        const userIndex = this.getIndexByName(username)
-        if (userIndex === -1) return false
-        this._users.splice(userIndex, 1)
+        if(!this._users[username]) return false
+        delete this._users[username]
         return true
-    }
-
-    getIndexById(userId) {
-        return this._users.findIndex(user => user.getId() === userId)
-    }
-    getIndexByName(username) {
-        return this._users.findIndex(user => user.getName() === username)
     }
 }
 

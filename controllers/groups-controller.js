@@ -83,22 +83,25 @@ class GroupsController {
                 const newGroup = new Group(groupname)
                 const newNode = new Node(newGroup, chosenNode)
                 chosenNode.addChildren(groupname, newNode) // TODO: check if key alreadt exists
+                preventTwoEntities(chosenNode)
                 callback()
             })
         })
     }
 
     addUserToGroup(callback) {       // TODO: need more validations
-        const questions = [
-            { question: 'Enter username: ', type: 'string' },
-            { question: 'Enter group name: ', type: 'string' }
-        ]
-        menuView.getInput(questions, answers => {
-            const username = answers[0]
-            const groupname = answers[1]
-            const user = this._users.getUser(username)
-            this._groups.addUserToGroup(user, groupname)
-            callback()
+        this.chooseNode(this._root, chosenNode => {
+            const questions = [
+                { question: 'Enter username: ', type: 'string' },
+                { question: 'Enter group name: ', type: 'string' }
+            ]
+            menuView.getInput(questions, answers => {
+                const username = answers[0]
+                const groupname = answers[1]
+                const user = this._users.getUser(username)
+                this._groups.addUserToGroup(user, groupname)
+                callback()
+            })
         })
     }
     removeUserFromGroup(callback) {       // TODO: need more validations
@@ -157,6 +160,25 @@ class GroupsController {
         }
         console.log()
         callback()
+    }
+
+    preventTwoEntities(currNode) {
+        const nodeChildernsKeys = currNode.getChildrensKeys()
+        if (nodeChildernsKeys.length) {
+            const currNodeGroup = currNode.getData()
+            const currGroupUsers = currNode.getUsers()
+            if (currGroupUsers.length) {
+                let othersGroup
+                if (nodeChildernsKeys.indexOf('others')) {
+                    othersGroup = currNode.getChildren('others')
+                } else {
+                    othersGroup = new Group('others')
+                    currNode.addChildren(new Node(othersGroup))
+                }
+                othersGroup.addUsers(...currGroupUsers)
+                currNodeGroup.removeAllUsers()
+            }
+        }
     }
 }
 

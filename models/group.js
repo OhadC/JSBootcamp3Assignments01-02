@@ -2,7 +2,7 @@ class Group {
     constructor(name) {
         this._id = Group.idCounter++    // unique
         this._name = name               // not unique
-        this._users = []
+        this._users = {}
     }
 
     getId() {
@@ -12,29 +12,31 @@ class Group {
         return this._name
     }
     getUsers() {
-        return this._users
+        return Object.values(this._users)
     }
 
     addUser(newUser) {
-        if (this.getIndexByName(newUser.getName()) !== -1) return false
-        this._users.push(newUser)
+        if (this._users[newUser.getName()]) return false
+        this._users[newUser.getName()] = newUser
+        return true
+    }
+    addUsers(...newUsers) {
+        for(let newUser in newUsers){
+            this.addUser(newUser)
+        }
         return true
     }
     removeUser(userName) {
-        const userIndex = this.getIndexByName(userName)
-        if (userIndex === -1) return false
-        this._users.splice(userIndex, 1)
+        if (!this._users[userName]) return false
+        delete this._users[userName]
         return true
     }
-
-    getIndexById(userId) {
-        return this._users.findIndex(user => user.getId() === userId)
-    }
-    getIndexByName(username) {
-        return this._users.findIndex(user => user.getName() === username)
+    removeAllUsers() {
+        this._users = {}
+        return true
     }
 }
 
 Group.idCounter = 0
 
-module.exports =  Group
+module.exports = Group
