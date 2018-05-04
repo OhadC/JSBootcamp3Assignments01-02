@@ -16,40 +16,55 @@ module.exports = class MainController {
 
         this.currNode = this._root
 
-        this.menu = {
+        this._menu = {
             main: {
                 title: 'Main menu',
                 options: ['users', 'groups', 'usersToGroups']
             },
-            ...this._usersController.menu,
-            ...this._groupsController.menu
+            ...this._usersController.getMenu(),
+            ...this._groupsController.getMenu()
         }
+
+        this._addOptionsToMenu()
     }
 
     init() {
         this.showMenu()
     }
 
-    showMenu(currMenu, menuObj) {
+    showMenu(currMenu) {
         currMenu = currMenu || 'main'
-        menuObj = menuObj || this.menu
-        const currMenuObj = menuObj[currMenu]
-        const optionsTitles = currMenuObj.options.map(option => menuObj[option].title)
+        const currMenuObj = this._menu[currMenu]
+        const optionsTitles = currMenuObj.options.map(option => this._menu[option].title)
         console.log('===', currMenuObj.title, '===')
         menuView.chooseOne(optionsTitles, optionIndex => {
-            this.handleInput(currMenu, menuObj, optionIndex)
+            this.handleInput(currMenu, optionIndex)
         })
     }
 
-    handleInput(currMenu, menuObj, optionIndex) {
-        const currMenuObj = menuObj[currMenu]
+    handleInput(currMenu, optionIndex) {
+        const currMenuObj = this._menu[currMenu]
         const selectedMenu = currMenuObj.options[optionIndex]
-        const selectedMenuObj = menuObj[selectedMenu]
+        const selectedMenuObj = this._menu[selectedMenu]
 
         if ('options' in selectedMenuObj) {
-            this.showMenu(selectedMenu, menuObj)
+            this.showMenu(selectedMenu)
         } else {
             selectedMenuObj.function(this.showMenu.bind(this))
+        }
+    }
+
+    _addOptionsToMenu() {
+         this._menu['exit'] = {
+            title: 'Exit',
+            function: () => process.exit()
+        }
+        for (const menuName in  this._menu) {
+            if (menuName === 'main') {
+                 this._menu[menuName].options.push('exit')
+            } else if ('options' in  this._menu[menuName]) {
+                 this._menu[menuName].options.push('main')
+            }
         }
     }
 }

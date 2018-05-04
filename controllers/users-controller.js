@@ -9,7 +9,7 @@ class UsersController {
             userDeleted: []
         }
 
-        this.menu = {
+        this._menu = {
             users: {
                 title: 'Users',
                 options: ['createOrDeleteUser', 'printUsers']
@@ -31,6 +31,10 @@ class UsersController {
                 function: this.deleteUser.bind(this)
             }
         }
+    }
+
+    getMenu() {
+        return this._menu
     }
 
     createNewUser(callback) {

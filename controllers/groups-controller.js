@@ -1,3 +1,4 @@
+const Node = require('../models/n-tree')
 const Group = require('../models/group')
 const menuView = require('../views/menu-view')
 
@@ -9,7 +10,7 @@ class GroupsController {
 
         usersController.on('userDeleted', this._groups.removeUserFromAllGroups.bind(this._groups))
 
-        this.menu = {
+        this._menu = {
             groups: {
                 title: 'Groups',
                 options: ['createOrDeleteGroups', 'printGroups']
@@ -53,33 +54,41 @@ class GroupsController {
         }
     }
 
+    getMenu() {
+        return this._menu
+    }
+
     chooseNode(currNode, callback) {
-        currNode = currNode || this._root
-        const currNodeChildrens = currNode.getCildrensKeys()
+        currNode = currNode
+        const currNodeChildrens = currNode.getChildrensKeys()
         const options = ['== Right here! ==', ...currNodeChildrens]
+        console.log('Pick group')
         menuView.chooseOne(options, optionIndex => {
             if (optionIndex === 0) {
                 callback(currNode)
             } else {
                 const chosenNodeKey = options[optionIndex]
-                const chosenNode = currNode.getCildren(chosenNodeKey)
+                const chosenNode = currNode.getChildren(chosenNodeKey)
                 this.chooseNode(chosenNode, callback)
             }
         })
     }
 
     createNewGroup(callback) {
-        const questions = [{ question: 'Enter group name: ', type: 'string' }]
-        menuView.getInput(questions, answers => {
-            const groupname = answers[0]
-            const newGroup = new Group(groupname)
-            this._groups.addGroup(newGroup)
-            callback()
+        this.chooseNode(this._root, chosenNode => {
+            const questions = [{ question: 'Enter group name: ', type: 'string' }]
+            menuView.getInput(questions, answers => {
+                const groupname = answers[0]
 
+                const newGroup = new Group(groupname)
+                const newNode = new Node(newGroup, chosenNode)
+                chosenNode.addChildren(groupname, newNode) // TODO: check if key alreadt exists
+                callback()
+            })
         })
     }
 
-    addUserToGroup(username, groupname) {       // TODO: need more validations
+    addUserToGroup(callback) {       // TODO: need more validations
         const questions = [
             { question: 'Enter username: ', type: 'string' },
             { question: 'Enter group name: ', type: 'string' }
@@ -91,9 +100,8 @@ class GroupsController {
             this._groups.addUserToGroup(user, groupname)
             callback()
         })
-
     }
-    removeUserFromGroup(username, groupname) {       // TODO: need more validations
+    removeUserFromGroup(callback) {       // TODO: need more validations
         const questions = [
             { question: 'Enter username: ', type: 'string' },
             { question: 'Enter group name: ', type: 'string' }
@@ -119,7 +127,7 @@ class GroupsController {
         })
     }
 
-    printGroups() {
+    printGroups(callback) {
         const groups = this._groups.getGroups()
         console.log()
         if (!groups.length) {
@@ -130,9 +138,10 @@ class GroupsController {
             })
         }
         console.log()
+        callback()
     }
 
-    printGroupsAndUsers() {
+    printGroupsAndUsers(callback) {
         const groups = this._groups.getGroups()
         console.log()
         if (!groups.length) {
@@ -147,6 +156,7 @@ class GroupsController {
             })
         }
         console.log()
+        callback()
     }
 }
 

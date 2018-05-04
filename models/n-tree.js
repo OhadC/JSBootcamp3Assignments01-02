@@ -1,7 +1,7 @@
 class Node {
     constructor(data, parent) {
         this._data = data
-        this._parent = parent
+        this._parent = parent || null
         this._childrens = {}
     }
 
@@ -18,7 +18,7 @@ class Node {
     getCildrens() {
         return Object.values(this._childrens)
     }
-    getCildrensKeys() {
+    getChildrensKeys() {
         return Object.keys(this._childrens)
     }
 
