@@ -34,12 +34,12 @@ class UsersController {
     }
 
     createNewUser(callback) {
-        const questionsArray = [
+        const questions = [
             { question: 'Enter Username: ', type: 'string' },
             { question: 'Enter Password: ', type: 'string' },
             { question: 'Enter Age: ', type: 'number' }
         ]
-        menuView.getInput(questionsArray, answers => {
+        menuView.getInput(questions, answers => {
             const username = answers[0]
             const password = answers[1]
             const age = answers[2]
@@ -51,9 +51,12 @@ class UsersController {
     }
 
     deleteUser(callback) {
-        const questionsArray = [{ question: 'Enter Username: ', type: 'string' }]
-        menuView.getInput(questionsArray, answers => {
+        const questions = [
+            { question: 'Enter Username: ', type: 'string' }
+        ]
+        menuView.getInput(questions, answers => {
             const username = answers[0]
+
             if (this._users.deleteUser(username)) {
                 this.trigger('userDeleted', username)
             }

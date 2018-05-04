@@ -39,6 +39,7 @@ module.exports = class menuView {
             const currQuestuionObj = questions[currQuestionIndex]
             rl.question(currQuestuionObj.question, answer => {
                 if (!validateInput(questions[currQuestionIndex], answer)) {
+                    console.log('Wrong input! Try again:')
                     ask()
                 } else {
                     currQuestionIndex++

@@ -21,18 +21,8 @@ module.exports = class MainController {
                 title: 'Main menu',
                 options: ['users', 'groups', 'usersToGroups']
             },
-            users: {
-                title: 'Users',
-                function: () => { this.showMenu('users', this._usersController.menu) }
-            },
-            groups: {
-                title: 'Groups',
-                function: () => { this.showMenu('groups', this._groupsController.menu) }
-            },
-            usersToGroups: {
-                title: 'Users to Groups association',
-                function: () => { this.showMenu('usersToGroups', this._groupsController.menu) }
-            }
+            ...this._usersController.menu,
+            ...this._groupsController.menu
         }
     }
 
@@ -53,14 +43,13 @@ module.exports = class MainController {
 
     handleInput(currMenu, menuObj, optionIndex) {
         const currMenuObj = menuObj[currMenu]
-        const selectdMenu = currMenuObj.options[optionIndex]
-        const selectdMenuObj = menuObj[selectdMenu]
+        const selectedMenu = currMenuObj.options[optionIndex]
+        const selectedMenuObj = menuObj[selectedMenu]
 
-        if ('options' in selectdMenuObj) {
-            this.showMenu(selectdMenu, menuObj)
+        if ('options' in selectedMenuObj) {
+            this.showMenu(selectedMenu, menuObj)
         } else {
-            selectdMenuObj.function(this.showMenu.bind(this))
+            selectedMenuObj.function(this.showMenu.bind(this))
         }
-
     }
 }

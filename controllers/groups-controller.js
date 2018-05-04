@@ -16,7 +16,7 @@ class GroupsController {
             },
             createOrDeleteGroups: {
                 title: 'Create / delete groups',
-                options: ['createNewgroup', 'deleteGroup']
+                options: ['createNewGroup', 'deleteGroup']
             },
             usersToGroups: {
                 title: 'Users to Groups association',
@@ -30,9 +30,9 @@ class GroupsController {
                 title: 'Get a list of groups in the system',
                 function: this.printGroups.bind(this)
             },
-            createNewgroup: {
+            createNewGroup: {
                 title: 'Create group',
-                function: this.createNewgroup.bind(this)
+                function: this.createNewGroup.bind(this)
             },
             deleteGroup: {
                 title: 'Delete group',
@@ -53,32 +53,24 @@ class GroupsController {
         }
     }
 
-    /*chooseNode(currNode, callback) {
+    chooseNode(currNode, callback) {
         currNode = currNode || this._root
         const currNodeChildrens = currNode.getCildrensKeys()
-        const options = ['[0] current Node']
-        this.printPotions(currNodeChildrens)
-        menuView.getInput([], answer => {
-            const choosenNodeIndex = +(answer[0]) - 1
-            if (choosenNodeIndex === -1) {
+        const options = ['== Right here! ==', ...currNodeChildrens]
+        menuView.chooseOne(options, optionIndex => {
+            if (optionIndex === 0) {
                 callback(currNode)
-            } else if (choosenNodeIndex > currNodeChildrens.length) {
-                console.log('Wrong input! Try again:')
-                this.chooseNode(currNode, callback)
             } else {
-                const choosenNodeKey = currNodeChildrens[choosenNodeIndex]
-                this.chooseNode(currNode.getCildren(choosenNodeKey), callback)
+                const chosenNodeKey = options[optionIndex]
+                const chosenNode = currNode.getCildren(chosenNodeKey)
+                this.chooseNode(chosenNode, callback)
             }
         })
+    }
 
-        // print tree on first lvl
-        // 0: right here
-        // other numbers by the tree
-    }*/
-
-    createNewgroup(callback) {
-        const questionsArray = [{ question: 'Enter group name: ', type: 'string' }]
-        menuView.getInput(questionsArray, answers => {
+    createNewGroup(callback) {
+        const questions = [{ question: 'Enter group name: ', type: 'string' }]
+        menuView.getInput(questions, answers => {
             const groupname = answers[0]
             const newGroup = new Group(groupname)
             this._groups.addGroup(newGroup)
@@ -88,11 +80,11 @@ class GroupsController {
     }
 
     addUserToGroup(username, groupname) {       // TODO: need more validations
-        const questionsArray = [
+        const questions = [
             { question: 'Enter username: ', type: 'string' },
             { question: 'Enter group name: ', type: 'string' }
         ]
-        menuView.getInput(questionsArray, answers => {
+        menuView.getInput(questions, answers => {
             const username = answers[0]
             const groupname = answers[1]
             const user = this._users.getUser(username)
@@ -101,12 +93,12 @@ class GroupsController {
         })
 
     }
-    removeUserFromGroup(username, groupname) {
-        const questionsArray = [
+    removeUserFromGroup(username, groupname) {       // TODO: need more validations
+        const questions = [
             { question: 'Enter username: ', type: 'string' },
             { question: 'Enter group name: ', type: 'string' }
         ]
-        menuView.getInput(questionsArray, answers => {
+        menuView.getInput(questions, answers => {
             const username = answers[0]
             const groupname = answers[1]
             this._groups.removeUserFromGroup(username, groupname)
@@ -114,9 +106,9 @@ class GroupsController {
         })
     }
 
-    deleteGroup(callback) {
-        const questionsArray = [{ question: 'Enter group name: ', type: 'string' }]
-        menuView.getInput(questionsArray, answers => {
+    deleteGroup(callback) {       // TODO: need more validations
+        const questions = [{ question: 'Enter group name: ', type: 'string' }]
+        menuView.getInput(questions, answers => {
             const groupname = answers[0]
             try {
                 this._groups.deleteGroup(groupname)
@@ -139,6 +131,7 @@ class GroupsController {
         }
         console.log()
     }
+
     printGroupsAndUsers() {
         const groups = this._groups.getGroups()
         console.log()
