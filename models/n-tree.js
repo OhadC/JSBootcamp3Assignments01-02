@@ -18,6 +18,9 @@ class Node {
     getCildrens() {
         return Object.values(this._childrens)
     }
+    getCildrensKeys() {
+        return Object.keys(this._childrens)
+    }
 
     getChildren(key) {
         if (!(key in this._childrens)) {

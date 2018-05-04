@@ -1,6 +1,6 @@
 class Users {
     constructor() {
-        this._users = []
+        this._users = [] // TODO: object
     }
 
     getUsers() {

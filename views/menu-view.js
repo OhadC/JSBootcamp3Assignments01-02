@@ -6,30 +6,62 @@ const rl = readline.createInterface({
 
 module.exports = class menuView {
 
-    static printMenu(currMenu, menuObj, handleInput) {
-        const currentMenuObj = menuObj[currMenu]
-        console.log(currentMenuObj.title)
-        rl.question(menuView.createMenuQuestion(currMenu, menuObj), handleInput)
+    static chooseOne(options, callback) {
+        const optionsLength = options.length - 1
+        const question = optionsToQuestion()
+        chooseOneInternal()
+
+        function optionsToQuestion() {
+            return options.reduce((prevStr, option, index) => {
+                return prevStr + '[' + (index + 1) + '] ' + option + '\n'
+            }, '')
+        }
+        function chooseOneInternal() {
+            rl.question(question, answer => {
+                const optionIndex = +answer - 1
+                if (isNaN(optionIndex) || optionIndex < 0 || optionIndex > optionsLength) {
+                    console.log('Wrong input! Try again:')
+                    chooseOneInternal()
+                } else {
+                    callback(optionIndex)
+                }
+            })
+        }
     }
 
-    static createMenuQuestion(currMenu, menuObj) {
-        const currentMenuObj = menuObj[currMenu]
-        return currentMenuObj.options.reduce((prevStr, option, index) => {
-            return prevStr + '[' + (index + 1) + '] ' + menuObj[option].title + '\n'
-        }, '')
-    }
+    static getInput(questions, callback) { // questions: [{question: string, answerType: 'string'/'number'}]
+        const answers = []
+        const questionsLength = questions.length
+        let currQuestionIndex = 0
+        ask()
 
-    static getInput(questionsArray, callback, answers){
-        answers = answers || []
-        rl.question(questionsArray.shift(), checkIfDone)
-
-        function checkIfDone(answer){
-            answers.push(answer)
-
-            if(questionsArray.length){
-                menuView.getInput(questionsArray, callback, answers)
-            } else {
-                callback(answers)
+        function ask() {
+            const currQuestuionObj = questions[currQuestionIndex]
+            rl.question(currQuestuionObj.question, answer => {
+                if (!validateInput(questions[currQuestionIndex], answer)) {
+                    ask()
+                } else {
+                    currQuestionIndex++
+                    answers.push(answer)
+                    if (currQuestionIndex < questionsLength) {
+                        ask()
+                    } else {
+                        callback(answers)
+                    }
+                }
+            })
+        }
+        function validateInput(question, answer) {
+            const answerType = question['type'] || ''
+            switch (answerType) {
+                case 'string':
+                    return !!answer.trim()
+                    break
+                case 'number':
+                    return !isNaN(+answer)
+                    break
+                default:
+                    return true
             }
         }
     }

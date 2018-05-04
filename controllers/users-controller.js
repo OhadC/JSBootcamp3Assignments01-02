@@ -34,24 +34,24 @@ class UsersController {
     }
 
     createNewUser(callback) {
-        const questionsArray = ['Enter Username: ', 'Enter Password: ', 'Enter Age: ']
+        const questionsArray = [
+            { question: 'Enter Username: ', type: 'string' },
+            { question: 'Enter Password: ', type: 'string' },
+            { question: 'Enter Age: ', type: 'number' }
+        ]
         menuView.getInput(questionsArray, answers => {
             const username = answers[0]
             const password = answers[1]
             const age = answers[2]
-            if (!this._validateUser(username, password, age)) {
-                this.createNewUser(callback)
-            }
-            else {
-                const newUser = new User(username, password, parseInt(age))
-                this._users.addUser(newUser)
-                callback()
-            }
+
+            const newUser = new User(username, password, parseInt(age))
+            this._users.addUser(newUser)
+            callback()
         })
     }
 
     deleteUser(callback) {
-        const questionsArray = ['Enter Username: ']
+        const questionsArray = [{ question: 'Enter Username: ', type: 'string' }]
         menuView.getInput(questionsArray, answers => {
             const username = answers[0]
             if (this._users.deleteUser(username)) {
@@ -73,31 +73,6 @@ class UsersController {
         }
         console.log()
         callback()
-    }
-
-    _validateUser(username, password, age) {
-        console.log()
-        if (!username.trim()) {
-            console.log('You must enter User name')
-            return false
-        }
-        if (!password.trim()) {
-            console.log('You must enter Password')
-            return false
-        }
-        if (!age.trim()) {
-            console.log('You must enter Age')
-            return false
-        }
-        if (!this._isInteger(age.trim())) {
-            console.log('Age must be a number')
-            return false
-        }
-        return true
-    }
-
-    _isInteger(value) {
-        return /^\d+$/.test(value)
     }
 
     on(eventName, handler) {

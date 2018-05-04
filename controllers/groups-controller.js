@@ -2,7 +2,8 @@ const Group = require('../models/group')
 const menuView = require('../views/menu-view')
 
 class GroupsController {
-    constructor(users, groups, usersController) {
+    constructor(root, users, groups, usersController) {
+        this._root = root
         this._users = users
         this._groups = groups
 
@@ -52,23 +53,45 @@ class GroupsController {
         }
     }
 
+    /*chooseNode(currNode, callback) {
+        currNode = currNode || this._root
+        const currNodeChildrens = currNode.getCildrensKeys()
+        const options = ['[0] current Node']
+        this.printPotions(currNodeChildrens)
+        menuView.getInput([], answer => {
+            const choosenNodeIndex = +(answer[0]) - 1
+            if (choosenNodeIndex === -1) {
+                callback(currNode)
+            } else if (choosenNodeIndex > currNodeChildrens.length) {
+                console.log('Wrong input! Try again:')
+                this.chooseNode(currNode, callback)
+            } else {
+                const choosenNodeKey = currNodeChildrens[choosenNodeIndex]
+                this.chooseNode(currNode.getCildren(choosenNodeKey), callback)
+            }
+        })
+
+        // print tree on first lvl
+        // 0: right here
+        // other numbers by the tree
+    }*/
+
     createNewgroup(callback) {
-        const questionsArray = ['Enter group name: ']
+        const questionsArray = [{ question: 'Enter group name: ', type: 'string' }]
         menuView.getInput(questionsArray, answers => {
             const groupname = answers[0]
-            if (!groupname.trim()) {
-                console.log('You must enter group name')
-                this.createNewgroup(callback)
-            } else {
-                const newGroup = new Group(groupname)
-                this._groups.addGroup(newGroup)
-                callback()
-            }
+            const newGroup = new Group(groupname)
+            this._groups.addGroup(newGroup)
+            callback()
+
         })
     }
 
     addUserToGroup(username, groupname) {       // TODO: need more validations
-        const questionsArray = ['Enter username: ', 'Enter group name: ']
+        const questionsArray = [
+            { question: 'Enter username: ', type: 'string' },
+            { question: 'Enter group name: ', type: 'string' }
+        ]
         menuView.getInput(questionsArray, answers => {
             const username = answers[0]
             const groupname = answers[1]
@@ -79,7 +102,10 @@ class GroupsController {
 
     }
     removeUserFromGroup(username, groupname) {
-        const questionsArray = ['Enter username: ', 'Enter group name: ']
+        const questionsArray = [
+            { question: 'Enter username: ', type: 'string' },
+            { question: 'Enter group name: ', type: 'string' }
+        ]
         menuView.getInput(questionsArray, answers => {
             const username = answers[0]
             const groupname = answers[1]
@@ -89,7 +115,7 @@ class GroupsController {
     }
 
     deleteGroup(callback) {
-        const questionsArray = ['Enter group name: ']
+        const questionsArray = [{ question: 'Enter group name: ', type: 'string' }]
         menuView.getInput(questionsArray, answers => {
             const groupname = answers[0]
             try {

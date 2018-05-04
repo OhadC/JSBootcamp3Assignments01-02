@@ -1,3 +1,5 @@
+const Node = require('../models/n-tree')
+const Group = require('../models/group')
 const Users = require('../models/users')
 const Groups = require('../models/groups')
 const UsersController = require('./users-controller')
@@ -8,8 +10,11 @@ module.exports = class MainController {
     constructor() {
         this._users = new Users()
         this._groups = new Groups()
+        this._root = new Node(new Group())
         this._usersController = new UsersController(this._users)
-        this._groupsController = new GroupsController(this._users, this._groups, this._usersController)
+        this._groupsController = new GroupsController(this._root, this._users, this._groups, this._usersController)
+
+        this.currNode = this._root
 
         this.menu = {
             main: {
@@ -38,26 +43,24 @@ module.exports = class MainController {
     showMenu(currMenu, menuObj) {
         currMenu = currMenu || 'main'
         menuObj = menuObj || this.menu
-        menuView.printMenu(currMenu, menuObj, answer => {
-            this.handleInput(currMenu, menuObj, answer)
+        const currMenuObj = menuObj[currMenu]
+        const optionsTitles = currMenuObj.options.map(option => menuObj[option].title)
+        console.log('===', currMenuObj.title, '===')
+        menuView.chooseOne(optionsTitles, optionIndex => {
+            this.handleInput(currMenu, menuObj, optionIndex)
         })
     }
 
-    handleInput(currMenu, menuObj, answer) {
-        const currMenuItem = menuObj[currMenu]
-        answer = +answer
-        if (!answer || answer <= 0 || answer > currMenuItem.options.length) {
-            console.log('Wrong input! Try again:')
-            this.showMenu(currMenu, menuObj)
-        } else {
-            const selectdMenu = currMenuItem.options[answer - 1]
-            const selectdMenuItem = menuObj[selectdMenu]
+    handleInput(currMenu, menuObj, optionIndex) {
+        const currMenuObj = menuObj[currMenu]
+        const selectdMenu = currMenuObj.options[optionIndex]
+        const selectdMenuObj = menuObj[selectdMenu]
 
-            if ('options' in selectdMenuItem) {
-                this.showMenu(selectdMenu, menuObj)
-            } else {
-                selectdMenuItem.function(this.showMenu.bind(this))
-            }
+        if ('options' in selectdMenuObj) {
+            this.showMenu(selectdMenu, menuObj)
+        } else {
+            selectdMenuObj.function(this.showMenu.bind(this))
         }
+
     }
 }
