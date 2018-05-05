@@ -15,7 +15,7 @@ class Node {
     getParent() {
         return this._parent
     }
-    getCildrens() {
+    getChildrens() {
         return Object.values(this._childrens)
     }
     getChildrensKeys() {

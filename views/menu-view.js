@@ -53,7 +53,8 @@ module.exports = class menuView {
             })
         }
         function validateInput(question, answer) {
-            const answerType = question['type'] || ''
+            const answerType = question['type']
+            if(!question['type']) return true
             switch (answerType) {
                 case 'string':
                     return !!answer.trim()

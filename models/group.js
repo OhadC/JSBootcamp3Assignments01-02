@@ -20,7 +20,7 @@ class Group {
         this._users[newUser.getName()] = newUser
         return true
     }
-    addUsers(...newUsers) {
+    addUsers(newUsers) {
         for(let newUser in newUsers){
             this.addUser(newUser)
         }

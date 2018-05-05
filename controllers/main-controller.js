@@ -10,7 +10,7 @@ module.exports = class MainController {
     constructor() {
         this._users = new Users()
         this._groups = new Groups()
-        this._root = new Node(new Group())
+        this._root = new Node(new Group('Root'))
         this._usersController = new UsersController(this._users)
         this._groupsController = new GroupsController(this._root, this._users, this._groups, this._usersController)
 

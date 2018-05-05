@@ -13,20 +13,22 @@ class GroupsController {
         this._menu = {
             groups: {
                 title: 'Groups',
-                options: ['createOrDeleteGroups', 'printGroups']
+                /*options: ['createOrDeleteGroups', 'printGroups']*/
+                options: ['createNewGroup', 'deleteGroup', 'printGroups']
             },
-            createOrDeleteGroups: {
+            /*createOrDeleteGroups: {
                 title: 'Create / delete groups',
                 options: ['createNewGroup', 'deleteGroup']
-            },
+            },*/
             usersToGroups: {
                 title: 'Users to Groups association',
-                options: ['addOrRemoveFromGroup', 'printGroupsAndUsers']
+                /*options: ['addOrRemoveFromGroup', 'printGroupsAndUsers']*/
+                options: ['addUserToGroup', 'removeUserFromGroup', 'printGroupsAndUsers']
             },
-            addOrRemoveFromGroup: {
+            /*addOrRemoveFromGroup: {
                 title: 'Add / remove user to / from group',
                 options: ['addUserToGroup', 'removeUserFromGroup']
-            },
+            },*/
             printGroups: {
                 title: 'Get a list of groups in the system',
                 function: this.printGroups.bind(this)
@@ -61,7 +63,10 @@ class GroupsController {
     chooseNode(currNode, callback) {
         currNode = currNode
         const currNodeChildrens = currNode.getChildrensKeys()
-        const options = ['== Right here! ==', ...currNodeChildrens]
+        const options = [
+            '== Right here! (' + currNode.getData().getName() + ') ==',
+            ...currNodeChildrens
+        ]
         console.log('Pick group')
         menuView.chooseOne(options, optionIndex => {
             if (optionIndex === 0) {
@@ -83,7 +88,7 @@ class GroupsController {
                 const newGroup = new Group(groupname)
                 const newNode = new Node(newGroup, chosenNode)
                 chosenNode.addChildren(groupname, newNode) // TODO: check if key alreadt exists
-                preventTwoEntities(chosenNode)
+                this.preventTwoEntities(chosenNode)
                 callback()
             })
         })
@@ -145,28 +150,39 @@ class GroupsController {
     }
 
     printGroupsAndUsers(callback) {
-        const groups = this._groups.getGroups()
-        console.log()
-        if (!groups.length) {
-            console.log('There is no groups')
-        } else {
-            groups.forEach(group => {
-                console.log(group.getName())
-                const users = group.getUsers()
-                users.forEach(user => {
-                    console.log('\t', user.getName(), '(' + user.getAge() + ")")
-                })
-            })
-        }
-        console.log()
+        const obj = toObj(this._root)
+
+        console.log(toString(obj))
+
         callback()
+
+        function toObj(currNode) {
+            const currNodeChildrens = currNode.getChildrens()
+            const childrensObj = currNodeChildrens.map(children => toObj(children))
+            const currGroup = currNode.getData()
+            return {
+                name: currGroup.getName(),
+                users: currGroup.getUsers(),
+                groups: childrensObj,
+                usersCount: childrensObj.reduce((sum, group) => sum + group.usersCount, 0) + currGroup.getUsers().length
+            }
+        }
+        function toString(objIn, dashes) {
+            dashes = dashes || 0
+            let str = `${'-'.repeat(dashes)} ${objIn.name} (${objIn.usersCount}) \n`
+            str += objIn.users.reduce(user => `${'-'.repeat(dashes + 1)} ${user.getName()} \n`, '')
+            objIn.groups.forEach(group => {
+                str += toString(group, dashes + 1)
+            })
+            return str
+        }
     }
 
     preventTwoEntities(currNode) {
         const nodeChildernsKeys = currNode.getChildrensKeys()
         if (nodeChildernsKeys.length) {
             const currNodeGroup = currNode.getData()
-            const currGroupUsers = currNode.getUsers()
+            const currGroupUsers = currNodeGroup.getUsers()
             if (currGroupUsers.length) {
                 let othersGroup
                 if (nodeChildernsKeys.indexOf('others')) {
