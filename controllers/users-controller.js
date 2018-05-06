@@ -45,25 +45,27 @@ class UsersController {
             { question: 'Enter Age: ', type: 'number' }
         ]
         menuView.getInput(questions, answers => {
-            const username = answers[0]
-            const password = answers[1]
-            const age = answers[2]
+            const username = answers[0].trim()
+            const password = answers[1].trim()
+            const age = +answers[2]
 
-            const newUser = new User(username, password, parseInt(age))
-            this._users.addUser(newUser)
+            const newUser = new User(username, password, age)
+            if (!this._users.addUser(newUser)) {
+                console.log('User with that name Already Exists')
+            }
             callback()
         })
     }
 
     deleteUser(callback) {
-        const questions = [
-            { question: 'Enter Username: ', type: 'string' }
-        ]
+        const questions = [{ question: 'Enter Username: ', type: 'string' }]
         menuView.getInput(questions, answers => {
             const username = answers[0]
 
             if (this._users.deleteUser(username)) {
                 this.trigger('userDeleted', username)
+            } else {
+                console.log('No user with that name')
             }
             callback()
         })

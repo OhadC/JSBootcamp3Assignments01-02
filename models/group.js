@@ -15,16 +15,17 @@ class Group {
         return Object.values(this._users)
     }
 
-    addUser(newUser) {
-        if (this._users[newUser.getName()]) return false
-        this._users[newUser.getName()] = newUser
+    addUser(user) {
+        if (this._users[user.getName()]) return false
+        this._users[user.getName()] = user
         return true
     }
-    addUsers(newUsers) {
-        for(let newUser in newUsers){
-            this.addUser(newUser)
-        }
+    addUsers(users) {
+        users.forEach(user => this.addUser(user))
         return true
+    }
+    isContainUser(username){
+        return (username in this._users)
     }
     removeUser(userName) {
         if (!this._users[userName]) return false

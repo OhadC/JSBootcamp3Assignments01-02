@@ -59,7 +59,7 @@ class CompositeGroup extends Group {
         })
         return foundedGroups
     }
-    flattening(){
+    flattening() {
         if (this._groups.length === 1) {
             flatteningStrategy(this)
             this.flattening(flatteningStrategy)
@@ -71,7 +71,7 @@ class CompositeGroup extends Group {
 
     removeUserFromAllGroups(username) {
         super.removeUser(username)
-        this._groups.forEach(group => group.removeUserFromAllGroups(user))
+        Object.values(this._groups).forEach(group => group.removeUserFromAllGroups(username))
     }
 }
 

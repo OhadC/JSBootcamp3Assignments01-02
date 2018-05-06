@@ -7,30 +7,16 @@ class GroupsController {
         this._root = root
         this._users = users
 
-        // usersController.on('userDeleted', this._groups.removeUserFromAllGroups.bind(this._groups))
+        usersController.on('userDeleted', this._root.removeUserFromAllGroups.bind(this._root))
 
         this._menu = {
             groups: {
                 title: 'Groups',
-                /*options: ['createOrDeleteGroups', 'printGroups']*/
-                options: ['createNewGroup', 'deleteGroup', 'printGroups']
+                options: ['createNewGroup', 'deleteGroup', 'flatteningTree']
             },
-            /*createOrDeleteGroups: {
-                title: 'Create / delete groups',
-                options: ['createNewGroup', 'deleteGroup']
-            },*/
             usersToGroups: {
                 title: 'Users to Groups association',
-                /*options: ['addOrRemoveFromGroup', 'printGroupsAndUsers']*/
-                options: ['addUserToGroup', 'removeUserFromGroup', 'printGroupsAndUsers']
-            },
-            /*addOrRemoveFromGroup: {
-                title: 'Add / remove user to / from group',
-                options: ['addUserToGroup', 'removeUserFromGroup']
-            },*/
-            printGroups: {
-                title: 'Get a list of groups in the system',
-                function: this.printGroups.bind(this)
+                options: ['addUserToGroup', 'removeUserFromGroup', 'printGroupsAndUsers', 'searchByUser']
             },
             createNewGroup: {
                 title: 'Create group',
@@ -51,6 +37,14 @@ class GroupsController {
             removeUserFromGroup: {
                 title: 'Remove user from group',
                 function: this.removeUserFromGroup.bind(this)
+            },
+            searchByUser: {
+                title: 'Search by user',
+                function: this.searchByUser.bind(this)
+            },
+            flatteningTree: {
+                title: 'Flatening tree',
+                function: this.flatteningTree.bind(this)
             }
         }
     }
@@ -62,15 +56,17 @@ class GroupsController {
     chooseGroup(currGroup, callback) {
         const currGroupGroupsKeys = currGroup.getGroupsKeys()
         if (!currGroupGroupsKeys.length) {
+            console.log('Picked group:', currGroup.getName())
             callback(currGroup)
         } else {
             const options = [
                 '== Right here! (' + currGroup.getName() + ') ==',
                 ...currGroupGroupsKeys
             ]
-            console.log('Pick group')
+            console.log('Pick a group:')
             menuView.chooseOne(options, optionIndex => {
                 if (optionIndex === 0) {
+                    console.log('Picked group:', currGroup.getName())
                     callback(currGroup)
                 } else {
                     const chosenGroupKey = options[optionIndex]
@@ -88,64 +84,75 @@ class GroupsController {
                 const groupname = answers[0]
 
                 const newGroup = new CompositeGroups(groupname, chosenGroup)
-                chosenGroup.addGroup(newGroup)
-                this.preventTwoEntities(chosenGroup)
+                if (!chosenGroup.addGroup(newGroup)) {
+                    console.log('No user with that name in the chosen group')
+                } else {
+                    this.preventTwoEntities(chosenGroup)
+                }
                 callback()
             })
         })
     }
-
-    addUserToGroup(callback) {       // TODO: need more validations
+    addUserToGroup(callback) {
         this.chooseGroup(this._root, chosenNode => {
             const questions = [{ question: 'Enter username: ', type: 'string' }]
             menuView.getInput(questions, answers => {
                 const username = answers[0]
 
                 const user = this._users.getUser(username)
-                chosenNode.addUser(user)
+                if (!user) {
+                    console.log('No user with that name')
+                } else if (!chosenNode.addUser(user)) {
+                    console.log('User already in that group')
+                } else {
+                    this.preventTwoEntities(chosenGroup)
+                }
                 callback()
             })
         })
     }
-    removeUserFromGroup(callback) {       // TODO: need more validations
+    removeUserFromGroup(callback) {
         this.chooseGroup(this._root, chosenGroup => {
             const questions = [{ question: 'Enter username: ', type: 'string' }]
             menuView.getInput(questions, answers => {
                 const username = answers[0]
 
-                chosenGroup.removeUser(username)
+                if (!chosenGroup.removeUser(username)) {
+                    console.log('No user with that name in the chosen group')
+                }
                 callback()
             })
         })
     }
-    deleteGroup(callback) {       // TODO: need more validations
+    deleteGroup(callback) {
         this.chooseGroup(this._root, chosenGroup => {
-            const chodenGroupName = chosenGroup.getNAme()
+            const chosenGroupName = chosenGroup.getName()
             const chosenGroupParent = chosenGroup.getParent()
-            chosenGroupParent.removeGroup(chodenGroupName)
+            chosenGroupParent.removeGroup(chosenGroupName)
             callback()
         })
     }
+    searchByUser(callback) {
+        const questions = [{ question: 'Enter Username: ', type: 'string' }]
+        menuView.getInput(questions, answers => {
+            const username = answers[0]
 
-    printGroups(callback) { // fix this
-        const groups = this._groups.getGroups()
-        console.log()
-        if (!groups.length) {
-            console.log('There is no groups')
-        } else {
-            groups.forEach(group => {
-                console.log(group.getName())
+            const results = this._root.search(group => group.isContainUser(username))
+            const paths = results.map(group => group.getPath())
+            paths.forEach(path => {
+                const toString = path.reduce((prev, curr) => prev + ' > ' + curr , '')
+                console.log(toString)
             })
-        }
-        console.log()
+            callback()
+        })
+    }
+    flatteningTree(callback) {
+        this._root.flattening()
         callback()
     }
-
     printGroupsAndUsers(callback) {
         const obj = toObj(this._root)
-
         console.log(toString(obj))
-
         callback()
 
         function toObj(currGroup) {
@@ -158,12 +165,12 @@ class GroupsController {
                 usersCount: groupsObj.reduce((sum, group) => sum + group.usersCount, 0) + currGroup.getUsers().length
             }
         }
-        function toString(objIn, dashes) {
-            dashes = dashes || 0
-            let str = `${'-'.repeat(dashes)} ${objIn.name} (${objIn.usersCount}) \n`
-            str += objIn.users.reduce(user => `${'-'.repeat(dashes + 1)} ${user.getName()} \n`, '')
+        function toString(objIn, level) {
+            level = level || 0
+            let str = `${'--'.repeat(level)}${objIn.name} (${objIn.usersCount}) \n`
+            str += objIn.users.reduce((lastStr, user) => lastStr + `${'--'.repeat(level + 1)}${user.getName()} \n`, '')
             objIn.groups.forEach(group => {
-                str += toString(group, dashes + 1)
+                str += toString(group, level + 1)
             })
             return str
         }
@@ -174,15 +181,14 @@ class GroupsController {
         if (groupGroupsKeys.length) {
             const currGroupUsers = currGroup.getUsers()
             if (currGroupUsers.length) {
-                let othersGroup
-                if (groupGroupsKeys.indexOf('others')) {
-                    othersGroup = currGroup.getGroup('others')
-                } else {
+                let othersGroup = currGroup.getGroup('others')
+                if (!othersGroup) {
                     othersGroup = new CompositeGroups('others', currGroup)
                     currGroup.addGroup(othersGroup)
                 }
-                othersGroup.addUsers(...currGroupUsers)
-                currNodeGroup.removeAllUsers()
+                othersGroup.addUsers(currGroupUsers)
+                currGroup.removeAllUsers()
+                console.log('User/s moved to group "others"')
             }
         }
     }
