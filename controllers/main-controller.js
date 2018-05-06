@@ -11,8 +11,6 @@ module.exports = class MainController {
         this._usersController = new UsersController(this._users)
         this._groupsController = new GroupsController(this._root, this._users, this._usersController)
 
-        this.currNode = this._root
-
         this._menu = {
             main: {
                 title: 'Main menu',

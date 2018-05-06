@@ -12,13 +12,8 @@ class UsersController {
         this._menu = {
             users: {
                 title: 'Users',
-                /*options: ['createOrDeleteUser', 'printUsers']*/
                 options: ['createNewUser', 'deleteUser', 'printUsers']
             },
-            /*createOrDeleteUser: {
-                title: 'Create / delete users',
-                options: ['createNewUser', 'deleteUser']
-            },*/
             printUsers: {
                 title: 'Get a list of users in the system (list of usernames)',
                 function: this.printUsers.bind(this)

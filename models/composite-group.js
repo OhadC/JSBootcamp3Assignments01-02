@@ -43,7 +43,7 @@ class CompositeGroup extends Group {
         innerPath = innerPath || []
         innerPath.unshift(this)
         if (this._parent) {
-            return this.getPath(innerPath) // tail recursion
+            return this._parent.getPath(innerPath) // tail recursion
         } else {
             return innerPath
         }
@@ -59,10 +59,17 @@ class CompositeGroup extends Group {
         })
         return foundedGroups
     }
-    flattening() {
-        if (this._groups.length === 1) {
-            flatteningStrategy(this)
-            this.flattening(flatteningStrategy)
+    flattening() {  // should be in reverse, delete also empty groups
+        if (Object.keys(this._groups).length === 1) {
+            const childKey = Object.keys(this._groups)[0]
+            const childUsers = this._groups[childKey].getUsers()
+            const childGroups = this._groups[childKey].getGroups()
+
+            this.removeGroup(childKey)
+            this.addUsers(childUsers)
+            childGroups.forEach(group => this._groups[group.getName()] = group)
+
+            this.flattening()
         }
         Object.keys(this._groups).forEach(key => {
             this._groups[key].flattening()

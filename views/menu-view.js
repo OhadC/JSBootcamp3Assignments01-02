@@ -36,8 +36,8 @@ module.exports = class menuView {
         ask()
 
         function ask() {
-            const currQuestuionObj = questions[currQuestionIndex]
-            rl.question(currQuestuionObj.question, answer => {
+            const currQuestionObj = questions[currQuestionIndex]
+            rl.question(currQuestionObj.question, answer => {
                 if (!validateInput(questions[currQuestionIndex], answer)) {
                     console.log('Wrong input! Try again:')
                     ask()
@@ -58,10 +58,8 @@ module.exports = class menuView {
             switch (answerType) {
                 case 'string':
                     return !!answer.trim()
-                    break
                 case 'number':
                     return !isNaN(+answer)
-                    break
                 default:
                     return true
             }

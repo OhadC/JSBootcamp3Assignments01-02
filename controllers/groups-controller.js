@@ -1,4 +1,3 @@
-const User = require('../models/user')
 const CompositeGroups = require('../models/composite-group')
 const menuView = require('../views/menu-view')
 
@@ -43,7 +42,7 @@ class GroupsController {
                 function: this.searchByUser.bind(this)
             },
             flatteningTree: {
-                title: 'Flatening tree',
+                title: 'Flattening tree',
                 function: this.flatteningTree.bind(this)
             }
         }
@@ -85,7 +84,7 @@ class GroupsController {
 
                 const newGroup = new CompositeGroups(groupname, chosenGroup)
                 if (!chosenGroup.addGroup(newGroup)) {
-                    console.log('No user with that name in the chosen group')
+                    console.log('Group with that name already exists')
                 } else {
                     this.preventTwoEntities(chosenGroup)
                 }
@@ -94,7 +93,7 @@ class GroupsController {
         })
     }
     addUserToGroup(callback) {
-        this.chooseGroup(this._root, chosenNode => {
+        this.chooseGroup(this._root, chosenGroup => {
             const questions = [{ question: 'Enter username: ', type: 'string' }]
             menuView.getInput(questions, answers => {
                 const username = answers[0]
@@ -102,7 +101,7 @@ class GroupsController {
                 const user = this._users.getUser(username)
                 if (!user) {
                     console.log('No user with that name')
-                } else if (!chosenNode.addUser(user)) {
+                } else if (!chosenGroup.addUser(user)) {
                     console.log('User already in that group')
                 } else {
                     this.preventTwoEntities(chosenGroup)
@@ -140,7 +139,7 @@ class GroupsController {
             const results = this._root.search(group => group.isContainUser(username))
             const paths = results.map(group => group.getPath())
             paths.forEach(path => {
-                const toString = path.reduce((prev, curr) => prev + ' > ' + curr , '')
+                const toString = path.reduce((prev, currGroup) => prev + ' > ' + currGroup.getName() , '')
                 console.log(toString)
             })
             callback()
