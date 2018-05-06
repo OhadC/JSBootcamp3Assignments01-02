@@ -1,14 +1,13 @@
-const Node = require('../models/n-tree')
-const Group = require('../models/group')
+const User = require('../models/user')
+const CompositeGroups = require('../models/composite-group')
 const menuView = require('../views/menu-view')
 
 class GroupsController {
-    constructor(root, users, groups, usersController) {
+    constructor(root, users, usersController) {
         this._root = root
         this._users = users
-        this._groups = groups
 
-        usersController.on('userDeleted', this._groups.removeUserFromAllGroups.bind(this._groups))
+        // usersController.on('userDeleted', this._groups.removeUserFromAllGroups.bind(this._groups))
 
         this._menu = {
             groups: {
@@ -60,82 +59,75 @@ class GroupsController {
         return this._menu
     }
 
-    chooseNode(currNode, callback) {
-        currNode = currNode
-        const currNodeChildrens = currNode.getChildrensKeys()
-        const options = [
-            '== Right here! (' + currNode.getData().getName() + ') ==',
-            ...currNodeChildrens
-        ]
-        console.log('Pick group')
-        menuView.chooseOne(options, optionIndex => {
-            if (optionIndex === 0) {
-                callback(currNode)
-            } else {
-                const chosenNodeKey = options[optionIndex]
-                const chosenNode = currNode.getChildren(chosenNodeKey)
-                this.chooseNode(chosenNode, callback)
-            }
-        })
+    chooseGroup(currGroup, callback) {
+        const currGroupGroupsKeys = currGroup.getGroupsKeys()
+        if (!currGroupGroupsKeys.length) {
+            callback(currGroup)
+        } else {
+            const options = [
+                '== Right here! (' + currGroup.getName() + ') ==',
+                ...currGroupGroupsKeys
+            ]
+            console.log('Pick group')
+            menuView.chooseOne(options, optionIndex => {
+                if (optionIndex === 0) {
+                    callback(currGroup)
+                } else {
+                    const chosenGroupKey = options[optionIndex]
+                    const chosenGroup = currGroup.getGroup(chosenGroupKey)
+                    this.chooseGroup(chosenGroup, callback)
+                }
+            })
+        }
     }
 
     createNewGroup(callback) {
-        this.chooseNode(this._root, chosenNode => {
+        this.chooseGroup(this._root, chosenGroup => {
             const questions = [{ question: 'Enter group name: ', type: 'string' }]
             menuView.getInput(questions, answers => {
                 const groupname = answers[0]
 
-                const newGroup = new Group(groupname)
-                const newNode = new Node(newGroup, chosenNode)
-                chosenNode.addChildren(groupname, newNode) // TODO: check if key alreadt exists
-                this.preventTwoEntities(chosenNode)
+                const newGroup = new CompositeGroups(groupname, chosenGroup)
+                chosenGroup.addGroup(newGroup)
+                this.preventTwoEntities(chosenGroup)
                 callback()
             })
         })
     }
 
     addUserToGroup(callback) {       // TODO: need more validations
-        this.chooseNode(this._root, chosenNode => {
-            const questions = [
-                { question: 'Enter username: ', type: 'string' },
-                { question: 'Enter group name: ', type: 'string' }
-            ]
+        this.chooseGroup(this._root, chosenNode => {
+            const questions = [{ question: 'Enter username: ', type: 'string' }]
             menuView.getInput(questions, answers => {
                 const username = answers[0]
-                const groupname = answers[1]
+
                 const user = this._users.getUser(username)
-                this._groups.addUserToGroup(user, groupname)
+                chosenNode.addUser(user)
                 callback()
             })
         })
     }
     removeUserFromGroup(callback) {       // TODO: need more validations
-        const questions = [
-            { question: 'Enter username: ', type: 'string' },
-            { question: 'Enter group name: ', type: 'string' }
-        ]
-        menuView.getInput(questions, answers => {
-            const username = answers[0]
-            const groupname = answers[1]
-            this._groups.removeUserFromGroup(username, groupname)
-            callback()
+        this.chooseGroup(this._root, chosenGroup => {
+            const questions = [{ question: 'Enter username: ', type: 'string' }]
+            menuView.getInput(questions, answers => {
+                const username = answers[0]
+
+                chosenGroup.removeUser(username)
+                callback()
+            })
         })
     }
-
     deleteGroup(callback) {       // TODO: need more validations
-        const questions = [{ question: 'Enter group name: ', type: 'string' }]
-        menuView.getInput(questions, answers => {
-            const groupname = answers[0]
-            try {
-                this._groups.deleteGroup(groupname)
-            } catch (e) {
-                console.log(e.message)
-            }
+        this.chooseGroup(this._root, chosenGroup => {
+            const chodenGroupName = chosenGroup.getNAme()
+            const chosenGroupParent = chosenGroup.getParent()
+            chosenGroupParent.removeGroup(chodenGroupName)
             callback()
         })
     }
 
-    printGroups(callback) {
+    printGroups(callback) { // fix this
         const groups = this._groups.getGroups()
         console.log()
         if (!groups.length) {
@@ -156,15 +148,14 @@ class GroupsController {
 
         callback()
 
-        function toObj(currNode) {
-            const currNodeChildrens = currNode.getChildrens()
-            const childrensObj = currNodeChildrens.map(children => toObj(children))
-            const currGroup = currNode.getData()
+        function toObj(currGroup) {
+            const currGroupGroups = currGroup.getGroups()
+            const groupsObj = currGroupGroups.map(group => toObj(group))
             return {
                 name: currGroup.getName(),
                 users: currGroup.getUsers(),
-                groups: childrensObj,
-                usersCount: childrensObj.reduce((sum, group) => sum + group.usersCount, 0) + currGroup.getUsers().length
+                groups: groupsObj,
+                usersCount: groupsObj.reduce((sum, group) => sum + group.usersCount, 0) + currGroup.getUsers().length
             }
         }
         function toString(objIn, dashes) {
@@ -178,18 +169,17 @@ class GroupsController {
         }
     }
 
-    preventTwoEntities(currNode) {
-        const nodeChildernsKeys = currNode.getChildrensKeys()
-        if (nodeChildernsKeys.length) {
-            const currNodeGroup = currNode.getData()
-            const currGroupUsers = currNodeGroup.getUsers()
+    preventTwoEntities(currGroup) {
+        const groupGroupsKeys = currGroup.getGroupsKeys()
+        if (groupGroupsKeys.length) {
+            const currGroupUsers = currGroup.getUsers()
             if (currGroupUsers.length) {
                 let othersGroup
-                if (nodeChildernsKeys.indexOf('others')) {
-                    othersGroup = currNode.getChildren('others')
+                if (groupGroupsKeys.indexOf('others')) {
+                    othersGroup = currGroup.getGroup('others')
                 } else {
-                    othersGroup = new Group('others')
-                    currNode.addChildren(new Node(othersGroup))
+                    othersGroup = new CompositeGroups('others', currGroup)
+                    currGroup.addGroup(othersGroup)
                 }
                 othersGroup.addUsers(...currGroupUsers)
                 currNodeGroup.removeAllUsers()

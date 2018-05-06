@@ -1,7 +1,5 @@
-const Node = require('../models/n-tree')
-const Group = require('../models/group')
 const Users = require('../models/users')
-const Groups = require('../models/groups')
+const CompositeGroup = require('../models/composite-group')
 const UsersController = require('./users-controller')
 const GroupsController = require('./groups-controller')
 const menuView = require('../views/menu-view')
@@ -9,10 +7,9 @@ const menuView = require('../views/menu-view')
 module.exports = class MainController {
     constructor() {
         this._users = new Users()
-        this._groups = new Groups()
-        this._root = new Node(new Group('Root'))
+        this._root = new CompositeGroup('Root')
         this._usersController = new UsersController(this._users)
-        this._groupsController = new GroupsController(this._root, this._users, this._groups, this._usersController)
+        this._groupsController = new GroupsController(this._root, this._users, this._usersController)
 
         this.currNode = this._root
 
