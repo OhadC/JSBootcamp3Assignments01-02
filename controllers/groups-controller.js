@@ -11,7 +11,7 @@ class GroupsController {
         this._menu = {
             groups: {
                 title: 'Groups',
-                options: ['createNewGroup', 'deleteGroup', 'flatteningTree']
+                options: ['createNewGroup', 'deleteGroup', 'searchByGroupName', 'flatteningTree']
             },
             usersToGroups: {
                 title: 'Users to Groups association',
@@ -24,6 +24,10 @@ class GroupsController {
             deleteGroup: {
                 title: 'Delete group',
                 function: this.deleteGroup.bind(this)
+            },
+            searchByGroupName: {
+                title: 'Search by group name',
+                function: this.searchByGroupName.bind(this)
             },
             printGroupsAndUsers: {
                 title: 'Get a list of groups and users under each group',
@@ -38,7 +42,7 @@ class GroupsController {
                 function: this.removeUserFromGroup.bind(this)
             },
             searchByUser: {
-                title: 'Search by user',
+                title: 'Search by user name',
                 function: this.searchByUser.bind(this)
             },
             flatteningTree: {
@@ -125,9 +129,13 @@ class GroupsController {
     }
     deleteGroup(callback) {
         this.chooseGroup(this._root, chosenGroup => {
-            const chosenGroupName = chosenGroup.getName()
             const chosenGroupParent = chosenGroup.getParent()
-            chosenGroupParent.removeGroup(chosenGroupName)
+            if (!chosenGroupParent) {
+                console.log('There is no groups (you can\'t delete the root)')
+            } else {
+                const chosenGroupName = chosenGroup.getName()
+                chosenGroupParent.removeGroup(chosenGroupName)
+            }
             callback()
         })
     }
@@ -139,7 +147,21 @@ class GroupsController {
             const results = this._root.search(group => group.isContainUser(username))
             const paths = results.map(group => group.getPath())
             paths.forEach(path => {
-                const toString = path.reduce((prev, currGroup) => prev + ' > ' + currGroup.getName() , '')
+                const toString = path.reduce((prev, currGroup) => prev + ' > ' + currGroup.getName(), '')
+                console.log(toString)
+            })
+            callback()
+        })
+    }
+    searchByGroupName(callback) {
+        const questions = [{ question: 'Enter Group name: ', type: 'string' }]
+        menuView.getInput(questions, answers => {
+            const groupname = answers[0]
+
+            const results = this._root.search(group => group.getName() === groupname)
+            const paths = results.map(group => group.getPath())
+            paths.forEach(path => {
+                const toString = path.reduce((prev, currGroup) => prev + ' > ' + currGroup.getName(), '')
                 console.log(toString)
             })
             callback()

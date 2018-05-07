@@ -50,15 +50,15 @@ module.exports = class MainController {
     }
 
     _addOptionsToMenu() {
-         this._menu['exit'] = {
+        this._menu['exit'] = {
             title: 'Exit',
             function: () => process.exit()
         }
-        for (const menuName in  this._menu) {
+        for (const menuName in this._menu) {
             if (menuName === 'main') {
-                 this._menu[menuName].options.push('exit')
-            } else if ('options' in  this._menu[menuName]) {
-                 this._menu[menuName].options.push('main')
+                this._menu[menuName].options.push('exit')
+            } else if ('options' in this._menu[menuName]) {
+                this._menu[menuName].options.push('main')
             }
         }
     }
