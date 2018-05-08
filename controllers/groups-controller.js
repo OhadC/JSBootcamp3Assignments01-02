@@ -174,13 +174,23 @@ class GroupsController {
     printGroupsAndUsers(callback) {
         this._root.updateUsersCount()
         printGroup(this._root, 0)
-        
+
         callback()
 
         function printGroup(currGroup, level) {
-            console.log("--".repeat(level) + currGroup)
-            currGroup.getUsers().forEach(user => console.log("--".repeat(level + 1) + user))
+            console.log(levelToString(level) + currGroup)
+            currGroup.getUsers().forEach(user => console.log(levelToString(level + 1) + user))
             currGroup.getGroups().forEach(group => printGroup(group, level + 1))
+        }
+        function levelToString(level) {
+            let str = ''
+            if (level > 0) {
+                if (level > 1) {
+                    str += '| '.repeat(level - 1)
+                }
+                str += '|-'
+            }
+            return str
         }
     }
 
