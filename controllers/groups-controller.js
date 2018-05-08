@@ -172,28 +172,15 @@ class GroupsController {
         callback()
     }
     printGroupsAndUsers(callback) {
-        const obj = toObj(this._root)
-        console.log(toString(obj))
+        this._root.updateUsersCount()
+        printGroup(this._root, 0)
+        
         callback()
 
-        function toObj(currGroup) {
-            const currGroupGroups = currGroup.getGroups()
-            const groupsObj = currGroupGroups.map(group => toObj(group))
-            return {
-                name: currGroup.getName(),
-                users: currGroup.getUsers(),
-                groups: groupsObj,
-                usersCount: groupsObj.reduce((sum, group) => sum + group.usersCount, 0) + currGroup.getUsers().length
-            }
-        }
-        function toString(objIn, level) {
-            level = level || 0
-            let str = `${'--'.repeat(level)}${objIn.name} (${objIn.usersCount}) \n`
-            str += objIn.users.reduce((lastStr, user) => lastStr + `${'--'.repeat(level + 1)}${user.getName()} \n`, '')
-            objIn.groups.forEach(group => {
-                str += toString(group, level + 1)
-            })
-            return str
+        function printGroup(currGroup, level) {
+            console.log("--".repeat(level) + currGroup)
+            currGroup.getUsers().forEach(user => console.log("--".repeat(level + 1) + user))
+            currGroup.getGroups().forEach(group => printGroup(group, level + 1))
         }
     }
 

@@ -5,6 +5,7 @@ class CompositeGroup extends Group {
         super(name)
         this._parent = parent || null
         this._groups = {}
+        this._usersCount = 0
     }
 
     getParent() {
@@ -15,6 +16,15 @@ class CompositeGroup extends Group {
     }
     getGroupsKeys() {
         return Object.keys(this._groups)
+    }
+    getUsersCount() {
+        return this._usersCount
+    }
+    updateUsersCount() {
+        this._usersCount = Object.values(this._groups).reduce((sum, group) => {
+            group.updateUsersCount()
+            return sum + group.getUsersCount()
+        }, 0) + Object.keys(this._users).length
     }
 
     getGroup(key) {
@@ -74,6 +84,9 @@ class CompositeGroup extends Group {
         Object.keys(this._groups).forEach(key => {
             this._groups[key].flattening()
         })
+    }
+    toString() {
+        return this._name + " (" + this._usersCount + ")"
     }
 
     removeUserFromAllGroups(username) {

@@ -24,6 +24,10 @@ class User {
     setAge(newAge) {
         this._age = newAge
     }
+
+    toString() {
+        return this._name
+    }
 }
 
 User.idCounter = 0
