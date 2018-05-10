@@ -89,8 +89,6 @@ class GroupsController {
                 const newGroup = new CompositeGroups(groupname, chosenGroup)
                 if (!chosenGroup.addGroup(newGroup)) {
                     console.log('Group with that name already exists')
-                } else {
-                    this.preventTwoEntities(chosenGroup)
                 }
                 callback()
             })
@@ -107,8 +105,6 @@ class GroupsController {
                     console.log('No user with that name')
                 } else if (!chosenGroup.addUser(user)) {
                     console.log('User already in that group')
-                } else {
-                    this.preventTwoEntities(chosenGroup)
                 }
                 callback()
             })
@@ -191,23 +187,6 @@ class GroupsController {
                 str += '|-'
             }
             return str
-        }
-    }
-
-    preventTwoEntities(currGroup) {
-        const groupGroupsKeys = currGroup.getGroupsKeys()
-        if (groupGroupsKeys.length) {
-            const currGroupUsers = currGroup.getUsers()
-            if (currGroupUsers.length) {
-                let othersGroup = currGroup.getGroup('others')
-                if (!othersGroup) {
-                    othersGroup = new CompositeGroups('others', currGroup)
-                    currGroup.addGroup(othersGroup)
-                }
-                othersGroup.addUsers(currGroupUsers)
-                currGroup.removeAllUsers()
-                console.log('User/s moved to group "others"')
-            }
         }
     }
 }

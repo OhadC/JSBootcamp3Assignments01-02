@@ -26,6 +26,12 @@ class CompositeGroup extends Group {
             return sum + group.getUsersCount()
         }, 0) + Object.keys(this._users).length
     }
+    addUser(user) {
+        if (this._users[user.getName()]) return false
+        this._users[user.getName()] = user
+        this.preventTwoEntities()
+        return true
+    }
 
     getGroup(key) {
         if (!(key in this._groups)) {
@@ -39,6 +45,7 @@ class CompositeGroup extends Group {
             return false
         }
         this._groups[groupName] = newGroup
+        this.preventTwoEntities()
         return true
     }
     removeGroup(key) {
@@ -58,13 +65,21 @@ class CompositeGroup extends Group {
             return innerPath
         }
     }
-    search(comparator) {
+    DFS(doToEveryGroup) {
+        const groups = [this]
+        while(groups.length > 0) {
+            const currGroup = groups.pop()
+            doToEveryGroup(currGroup)
+            groups.push(currGroup.getGroups())
+        }
+    }
+    search(predicate) {
         const foundedGroups = []
-        if (comparator(this)) {
+        if (predicate(this)) {
             foundedGroups.push(this)
         }
         Object.keys(this._groups).forEach(key => {
-            const result = this._groups[key].search(comparator)
+            const result = this._groups[key].search(predicate)
             foundedGroups.push(...result)
         })
         return foundedGroups
@@ -92,6 +107,22 @@ class CompositeGroup extends Group {
     removeUserFromAllGroups(username) {
         super.removeUser(username)
         Object.values(this._groups).forEach(group => group.removeUserFromAllGroups(username))
+    }
+    preventTwoEntities() {
+        const groupsKeys = this.getGroupsKeys()
+        if (groupsKeys.length) {
+            const users = this.getUsers()
+            if (users.length) {
+                let othersGroup = this.getGroup('others')
+                if (!othersGroup) {
+                    othersGroup = new CompositeGroups('others', currGroup)
+                    this.addGroup(othersGroup)
+                }
+                othersGroup.addUsers(users)
+                this.removeAllUsers()
+                console.log('User/s moved to group "others"')
+            }
+        }
     }
 }
 
